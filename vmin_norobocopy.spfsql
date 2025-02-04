@@ -1,0 +1,1954 @@
+<OPTIONS>
+/WRITE-FILE=Y
+/INSTANCE=6285
+/CSV=TT
+</OPTIONS>
+
+SCRIPT NAME	WW	VERSION	OWNER	COMMENT
+ICMPCS_Vmin_CSR_HDMX_rev01	WW12'22	Rev.01	Wu, Fiona	1. 2022ww12. HDXM Vmin shift monitor, per MRB#10895351 learning.
+ICMPCS_Vmin_CSR_HDMX_rev02	WW14'21	Rev.02	Wu, Fiona	1.Include child lot trace func for CSR onhold. Lot trace is based on lot level transaction in MARS, so the trace result is in lot level. Potentially may have over-contain.
+ICMPCS_Vmin_CSR_HDMX_rev03	ww23'22	Rev.03	Wu, Fiona	"1.Enabled N- and N+ lot, tracking for trigggered HW,this is in unit level. 
+2.Setting config csv file in global variable to enable single script/main folder to handle different products/wrapper.
+3.Script enhanced to trigger mail notification if any lot run but w/o Vmin computing conducted."
+ICMPCS_Vmin_CSR_HDMX_rev05	ww25'22	Rev.05	Wu, Fiona	this is based on rev3 script, still use back Midas DB, and have limit setting in config file.
+ICMPCS_Vmin_CSR_HDMX_rev06	ww26'22	Rev.06	Wu, Fiona	this is based on rev5 script, change from Midas to HBASE for test result extraction, in step13/14/16 to fit the change.
+ICMPCS_Vmin_CSR_HDMX_rev07	ww35'22	Rev.07	Wu, Fiona	1.Enabled mini-SST version to generate VF_CE in main job folder;2. add decoder4 in main script.3.update in html notification to ease debug and validation
+ICMPCS_Vmin_CSR_HDMX_rev08	ww38'22	Rev.08	Wu, Fiona	1.handle PRL abnormal UPS token issue to filter str type result post decoding, and handle whole lot no UPS token return issue. 2. decode script move from.... 
+ICMPCS_Vmin_CSR_HDMX_rev09	ww41'22	Rev.09	Wu, Fiona	Added process_step=C to handle CGM product, in rawdata_hbase and in find_neigb_lot.
+
+
+
+<---- New Query ---->
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\SPFDelete.bat "*.csv,*.py,*.txt,*.tab" "N"
+/PROMPT-TEXT=Step 2-1. Delete Files
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WRITE-FILE=Y
+/INSTANCE=6285
+/PROMPT-TEXT=Step 2-2. generate ARIES_DB.csv
+/CSV=ARIES_DB.csv
+</OPTIONS>
+
+ARIES_DB,EMAIL_CSR,CSR_folder,Folder_site,MARS_DB
+PG.ARIES,vinnie.wen.ying.tiang@intel.com,\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group\CSR,\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group,PG.ALL.MARS
+<---- New Query ---->
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\RoboCopy.va "ICMPCS_PBICVmin_HDMX_cfg_dummy.csv" "\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy" "." "10" "30" "Y" "" "N"
+/PROMPT-TEXT=Step 2-5. Robocopy general files
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\RoboCopy.va "EMAIL_LOT.txt" "\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group" "." "10" "30" "Y" "" "N"
+/PROMPT-TEXT=Step 2-6. Robocopy old lot list file
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\SPFRename.va "ICMPCS_PBICVmin_HDMX_cfg_dummy.csv" "ICMPCS_PBICVmin_HDMX_cfg.csv"
+/PROMPT-TEXT=Step 2-7. Rename Files
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/NODE=.\
+/OLEDB=SQLite
+/ENGINE=SQLite
+/UN=
+/PW=
+/WORKDIR=.\
+/T=Yes
+/TS=_20240830103149
+/CSV=ICMPCS_PBICVmin_HDMX_cfg_site.csv
+/TABLE=ICMPCS_PBICVmin_HDMX_cfg.csv
+/HEADERS=FACILITY,MARS_DB,EMAIL_LOT,EMAIL_CSR,Folder_site,CSR_folder,email_title,hr_interval,min_lot_size,operation,vmin_token,decode_script,tp,delta,x_iqr,ss_target,ss_rest,exclusion,site_list,in_scope
+/INSTANCE=6285
+/USE_LEGACY_PIVOT_HEADERS=Y
+/PROMPT-TEXT=Step 2-8.1. Fetching Text (SQLite) Data
+/HEADERS_UNIQUE=Y
+/QUOTECSV=Y
+/HADOOP_SERVER_DEFAULT=ATD_ATM.HADOOP
+</OPTIONS>
+
+SELECT /*L2*/  DISTINCT 
+          [FACILITY] AS [FACILITY]
+         ,[MARS_DB] AS [MARS_DB]
+         ,[EMAIL_LOT] AS [EMAIL_LOT]
+         ,[EMAIL_CSR] AS [EMAIL_CSR]
+         ,[Folder_site] AS [Folder_site]
+         ,[CSR_folder] AS [CSR_folder]
+         ,[email_title] AS [email_title]
+         ,[hr_interval] AS [hr_interval]
+         ,[min_lot_size] AS [min_lot_size]
+         ,[operation] AS [operation]
+         ,[vmin_token] AS [vmin_token]
+         ,[decode_script] AS [decode_script]
+         ,[tp] AS [tp]
+         ,[delta] AS [delta]
+         ,[x_iqr] AS [x_iqr]
+         ,[ss_target] AS [ss_target]
+         ,[ss_rest] AS [ss_rest]
+         ,[exclusion] AS [exclusion]
+         ,[site_list] AS [site_list]
+         ,[in_scope] AS [in_scope]
+FROM
+(
+SELECT /*L1*/ 
+          [FACILITY] AS [FACILITY]
+         ,[MARS_DB] AS [MARS_DB]
+         ,[EMAIL_LOT] AS [EMAIL_LOT]
+         ,[EMAIL_CSR] AS [EMAIL_CSR]
+         ,[Folder_site] AS [Folder_site]
+         ,[CSR_folder] AS [CSR_folder]
+         ,[email_title] AS [email_title]
+         ,[hr_interval] AS [hr_interval]
+         ,[min_lot_size] AS [min_lot_size]
+         ,[operation] AS [operation]
+         ,[vmin_token] AS [vmin_token]
+         ,[decode_script] AS [decode_script]
+         ,[tp] AS [tp]
+         ,[delta] AS [delta]
+         ,[x_iqr] AS [x_iqr]
+         ,[ss_target] AS [ss_target]
+         ,[ss_rest] AS [ss_rest]
+         ,[exclusion] AS [exclusion]
+         ,[site_list] AS [site_list]
+         ,CharIndex_v2( [FACILITY] , [site_list] ,1,1) AS [in_scope]
+FROM
+(
+SELECT /*L0*/  
+          'A01' AS [FACILITY]
+         ,'PG.ALL.MARS' AS [MARS_DB]
+         ,'EMAIL_LOT.txt' AS [EMAIL_LOT]
+         ,'vinnie.wen.ying.tiang@intel.com' AS [EMAIL_CSR]
+         ,'\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group' AS [Folder_site]
+         ,'\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group\CSR' AS [CSR_folder]
+         ,a0.[email_title] AS [email_title]
+         ,a0.[hr_interval] AS [hr_interval]
+         ,a0.[min_lot_size] AS [min_lot_size]
+         ,a0.[operation] AS [operation]
+         ,a0.[vmin_token] AS [vmin_token]
+         ,a0.[decode_script] AS [decode_script]
+         ,a0.[tp] AS [tp]
+         ,CASE WHEN a0.[delta] = '' THEN NULL ELSE CAST (a0.[delta] AS REAL) END AS [delta]
+         ,CASE WHEN a0.[x_iqr] = '' THEN NULL ELSE CAST (a0.[x_iqr] AS REAL) END AS [x_iqr]
+         ,CASE WHEN a0.[ss_target] = '' THEN NULL ELSE CAST (a0.[ss_target] AS REAL) END AS [ss_target]
+         ,CASE WHEN a0.[ss_rest] = '' THEN NULL ELSE CAST (a0.[ss_rest] AS REAL) END AS [ss_rest]
+         ,a0.[exclusion] AS [exclusion]
+         ,a0.[site_list] AS [site_list]
+FROM 
+[ICMPCS_PBICVmin_HDMX_cfg] a0
+) t /*L0*/
+) t /*L1*/
+WHERE
+              [in_scope] > 0
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\RoboCopy.va "ICMPCS_PBICVmin_HDMX_cfg_site.csv" "." "\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group" "10" "30" "Y" "" "N"
+/PROMPT-TEXT=Step 2-9. Robocopy site config file
+</OPTIONS>
+
+
+<---- New Query ---->
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\SPFDelete.bat "triggered_hw_all.csv" "N"
+/PROMPT-TEXT=Step 4-1. Delete Files
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WRITE-FILE=Y
+/INSTANCE=6285
+/PROMPT-TEXT=Step 4-2. Write Text to a file. Optionally use <EOF> to mark end of file
+/CSV=triggered_hw_all.csv
+</OPTIONS>
+
+Dummy_Column
+Dummy
+<---- New Query ---->
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\WaitFile.va "triggered_hw_all.csv" "30"
+/PROMPT-TEXT=Step 4-3. Wait for a file to appear or a period of time to elapse
+</OPTIONS>
+
+
+<---- New Query ---->
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={RUN-LOOP} "ICMPCS_PBICVmin_HDMX_cfg_site.csv" "Vmin_cfg_1raw.csv" "1" "N"
+/PROMPT-TEXT=Step 5. Loop through a File
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={START-MACRO} "Vmin_cfg_1raw.csv"
+/PROMPT-TEXT=Step 6. Start Macro Processing
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\SPFDelete.bat "last_2h_lot_list.csv" "N"
+/PROMPT-TEXT=Step 7. Delete Files
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/NODE=All.MIDAS@TERADATAIWA@MDPRD1.intel.com@MIDAS@@
+/UN=
+/PW=
+/OLEDB=TERADATA
+/ENGINE=UBER-NET
+/WORKDIR=.\
+/T=
+/TS=_20240830103149
+/CSV=vtiang_a0_6285.tab
+/INSTANCE=6285
+/USE_LEGACY_PIVOT_HEADERS=Y
+/PROMPT-TEXT=Step 8-1.1-a0. Fetching MIDAS Data
+/RECORD=Test_or_Sort_Lot_Rollup_Reference_MIDAS
+/HADOOP_SERVER_DEFAULT=ATD_ATM.HADOOP
+</OPTIONS>
+
+SELECT  DISTINCT 
+          facility AS facility
+         ,fac_lot AS fac_lot
+         ,lot AS lot
+         ,operation AS operation
+         ,PROD AS PROD
+         ,devrevstep AS devrevstep
+         ,program_or_recipe AS program_or_recipe
+         ,total_tested AS total_tested
+         ,CAST(test_end_date AS char(19)) AS test_end_date
+         ,CAST(load_end_date AS char(19)) AS load_end_date
+         ,CAST(CURRENT_TIMESTAMP AS char(19)) AS current_ts
+FROM
+(
+SELECT  
+          mlato.facility AS facility
+         ,mlato.facility  || '_' ||  mlato.lot AS fac_lot
+         ,mlato.lot AS lot
+         ,mlato.operation AS operation
+         ,SUBSTR(   mlato.singular_prog_or_bi_recipe_nm ,1,9) AS PROD
+         ,mlato.singular_devrevstep AS devrevstep
+         ,mlato.singular_prog_or_bi_recipe_nm AS program_or_recipe
+         ,cast(mlato.lato_total_tested as float) AS total_tested
+         ,mlato.lato_test_end_date_time AS test_end_date
+         ,mlato.lato_load_end_date_time AS load_end_date
+FROM 
+midas.MDS_Lot_At_Test_Operation mlato
+WHERE
+              mlato.lato_valid_flag = 'Y' 
+ AND      mlato.lato_total_tested Is Not Null  
+ AND      mlato.operation In ('<<<OPERATION>>>') 
+ AND      (mlato.facility In ('A01') 
+ AND      mlato.facility In ('<<<site_list>>>') )
+ AND      mlato.lot Is Not Null  
+ AND      (mlato.singular_prog_or_bi_recipe_nm LIKE  '<<<TP>>>'
+) 
+ AND      mlato.lot Like '<<<CL_LOTNUMBER>>>' 
+) t
+
+<---- New Query ---->
+
+<OPTIONS>
+/NODE=PG.ALL.MARS
+/UN=
+/PW=
+/OLEDB=SQLPlus
+/ENGINE=VA
+/WORKDIR=.\
+/T=
+/TS=_20240830103149
+/CSV=vtiang_a1_6285.tab
+/HEADERS=lot_1,operation_1,owner,prodgroup3
+/INSTANCE=6285
+/USE_LEGACY_PIVOT_HEADERS=Y
+/PROMPT-TEXT=Step 8-1.1-a1. Fetching MARS Data
+/RECORD=WIP_Lot_History_v2
+/HADOOP_SERVER_DEFAULT=ATD_ATM.HADOOP
+</OPTIONS>
+
+/*BEGIN SQL*/
+SELECT  DISTINCT 
+          f0.lot AS lot_1
+         ,f0.operation AS operation_1
+         ,f0.owner AS owner
+         ,p.prodgroup3 AS prodgroup3
+FROM 
+@[]@F_LotHist f0
+LEFT JOIN @[]@F_Product p ON p.product = f0.product AND p.facility = f0.facility AND NVL(p.latest_version,'Y') = 'Y' -- AND p.product_version = f0.product_version
+WHERE
+NVL(f0.history_deleted_flag,'N') = 'N'
+AND      f0.owner <> 'EMPTYFOUP'
+ AND      (f0.lot In 
+SQL_Get_CSV_List(".\vtiang_a0_6285.tab->999", lot, "f0.lot In") 
+ AND      f0.owner Not In ('TEST') 
+ AND      f0.owner Is Not Null  
+-- Tail A
+/*END SQL*/
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/RESET=Y
+/NODE=.\
+/OLEDB=SQLite
+/ENGINE=SQLite
+/UN=
+/PW=
+/WORKDIR=.\
+/T=No
+/TS=_20240830103149
+/CSV=last_hrs_MIDAS_load_lot_list.csv
+/TABLE=vtiang_a0_6285.tab,vtiang_a1_6285.tab
+/HEADERS=facility,fac_lot,lot,operation,PROD,devrevstep,program_or_recipe,total_tested,test_end_date,load_end_date,current_ts,lot_1,operation_1,owner,prodgroup3
+/DELETE=*Instance*
+/INSTANCE=6285
+/USE_LEGACY_PIVOT_HEADERS=Y
+/SQLITE_DT=,facility(c),fac_lot(c),lot(c),operation(c),PROD(c),devrevstep(c),program_or_recipe(c),total_tested(f),test_end_date(g),load_end_date(g),current_ts(g),lot_1(c),operation_1(c),owner(c),prodgroup3(c)
+/QUOTECSV=Y
+/EMPTY_TO_NULL=Y
+/HADOOP_SERVER_DEFAULT=ATD_ATM.HADOOP
+</OPTIONS>
+
+
+DROP INDEX IF EXISTS IdxA1;
+Create Index IF NOT EXISTS IdxA1 ON [vtiang_a1_6285] ([lot_1],[operation_1]);
+
+SELECT /*L0*/  DISTINCT 
+          a0.[facility] AS [facility]
+         ,a0.[fac_lot] AS [fac_lot]
+         ,a0.[lot] AS [lot]
+         ,a0.[operation] AS [operation]
+         ,a0.[PROD] AS [PROD]
+         ,a0.[devrevstep] AS [devrevstep]
+         ,a0.[program_or_recipe] AS [program_or_recipe]
+         ,a0.[total_tested] AS [total_tested]
+         ,a0.[test_end_date] AS [test_end_date]
+         ,a0.[load_end_date] AS [load_end_date]
+         ,a0.[current_ts] AS [current_ts]
+         ,a1.[lot_1] AS [lot_1]
+         ,a1.[operation_1] AS [operation_1]
+         ,a1.[owner] AS [owner]
+         ,a1.[prodgroup3] AS [prodgroup3]
+FROM 
+           [vtiang_a0_6285] a0
+ INNER JOIN [vtiang_a1_6285] a1
+  ON a0.[lot] = a1.[lot_1] 
+ AND a0.[operation] = a1.[operation_1]
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\SPFDelete.bat "old_scan_lot_list.csv,last_hrs_lot_scan.csv" "N"
+/PROMPT-TEXT=Step 9-1. Delete Files
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\RoboCopy.va "old_scan_lot_list.csv" "\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group" "." "100" "30" "Y" "" "N"
+/PROMPT-TEXT=Step 9-2. Robocopy Files/Folders
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/NODE=.\
+/OLEDB=SQLite
+/ENGINE=SQLite
+/UN=
+/PW=
+/WORKDIR=.\
+/T=No
+/TS=_20240830103150
+/CSV=last_hrs_lot_scan.csv
+/TABLE=last_hrs_MIDAS_load_lot_list.csv
+/HEADERS=facility,fac_lot,lot,operation,prod,devrevstep,program_or_recipe,total_tested,test_end_date,load_end_date,current_ts,prodgroup3,owner
+/INSTANCE=6285
+/USE_LEGACY_PIVOT_HEADERS=Y
+/PROMPT-TEXT=Step 9-3.1. Fetching Text (SQLite) Data
+/HEADERS_UNIQUE=Y
+/QUOTECSV=Y
+/HADOOP_SERVER_DEFAULT=ATD_ATM.HADOOP
+</OPTIONS>
+
+SELECT /*L0*/  DISTINCT 
+          a2.[facility] AS [facility]
+         ,a2.[fac_lot] AS [fac_lot]
+         ,a2.[lot] AS [lot]
+         ,a2.[operation] AS [operation]
+         ,a2.[prod] AS [prod]
+         ,a2.[devrevstep] AS [devrevstep]
+         ,a2.[program_or_recipe] AS [program_or_recipe]
+         ,a2.[total_tested] AS [total_tested]
+         ,a2.[test_end_date] AS [test_end_date]
+         ,a2.[load_end_date] AS [load_end_date]
+         ,a2.[current_ts] AS [current_ts]
+         ,a2.[prodgroup3] AS [prodgroup3]
+         ,a2.[owner] AS [owner]
+FROM 
+[last_hrs_MIDAS_load_lot_list] a2
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={ROWS-IN-FILE} "last_hrs_lot_scan.csv" "RowsInFile_lot" "N"
+/PROMPT-TEXT=Step 10. Count Rows in a File
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={IF-THEN} "RowsInFile_lot" "GT" "0" "" "" "" ""
+/PROMPT-TEXT=Step 11. Apply Conditional Logic
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={RUN-LOOP} "last_hrs_lot_scan.csv" "last_hrs_lot_scan_temp.csv" "1" "N"
+/PROMPT-TEXT=Step 12. Loop through a File
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\SPFDelete.bat "rawdata.csv,Test_or_Sort_Result_By_Unit_Midas.tab,PostProcess.tab,Vmin.csv,vmin_result.csv" "N"
+/PROMPT-TEXT=Step 13. Delete Files
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/NODE=.\
+/OLEDB=SQLite
+/ENGINE=SQLite
+/UN=
+/PW=
+/WORKDIR=.\
+/T=
+/TS=_20240830103150
+/CSV=vtiang_SQL_6285.tab
+/TABLE=last_hrs_lot_scan_temp.csv
+/HEADERS=fac_lot,facility,lot,operation,prod,devrevstep,total_tested,program_or_recipe,test_end_date,load_end_date,current_ts
+/INSTANCE=6285
+/USE_LEGACY_PIVOT_HEADERS=Y
+/PROMPT-TEXT=Step 14-1.1. Fetching Text (SQLite) Data
+/HEADERS_UNIQUE=Y
+/QUOTECSV=Y
+/EMPTY_TO_NULL=Y
+/HADOOP_SERVER_DEFAULT=ATD_ATM.HADOOP
+</OPTIONS>
+
+SELECT /*L0*/ 
+          a1.[fac_lot] AS [fac_lot]
+         ,a1.[facility] AS [facility]
+         ,a1.[lot] AS [lot]
+         ,a1.[operation] AS [operation]
+         ,a1.[prod] AS [prod]
+         ,a1.[devrevstep] AS [devrevstep]
+         ,a1.[total_tested] AS [total_tested]
+         ,a1.[program_or_recipe] AS [program_or_recipe]
+         ,a1.[test_end_date] AS [test_end_date]
+         ,a1.[load_end_date] AS [load_end_date]
+         ,a1.[current_ts] AS [current_ts]
+FROM 
+[last_hrs_lot_scan_temp] a1
+
+<---- New Query ---->
+
+<OPTIONS>
+/NODE=All.MIDAS@TERADATAIWA@MDPRD1.intel.com@MIDAS@@
+/UN=
+/PW=
+/OLEDB=PYSCRIPTDRIVERIMPORT
+/ENGINE=VA
+/WORKDIR=.\
+/T=
+/TS=_20240830103150
+/CSV=vtiang_a0_6285.tab
+/INSTANCE=6285
+/USE_LEGACY_PIVOT_HEADERS=Y
+/PROMPT-TEXT=Step 14-1.2-a0. Fetching MIDAS Data
+/RECORD=Test_or_Sort_Unit_or_Die_Test_Results_HBASE_MIDAS
+/HADOOP_SERVER_DEFAULT=ATD_ATM.HADOOP
+</OPTIONS>
+
+import os
+import sys
+import json
+from datetime import datetime
+import pathlib
+from pathlib import Path
+import random
+import logging
+
+def parse_test_value_filter(filter_str,mytoken):
+    myresult=''
+    mydlm= ''
+    if filter_str.strip() == '':
+        myresult=',null as TestVALUE_Filter '
+    else:
+        #filter_str=filter_str.replace(',)','').replace("'",'').replace('\n,','<;>').replace(' AND      ' + mytoken + ' In (','').replace(')','').replace('\r','').replace('\n','').strip()
+        filter_str=filter_str.replace(',)','').replace("')",'').replace("'",'').replace('\n,','<;>').replace(' AND      ' + mytoken + ' In (','').replace('\r','').replace('\n','').strip()
+        filter_list=filter_str.split('<;>')
+        for item in filter_list:
+            item=str(item).strip()
+            pos = item.find(',')
+            if pos != -1:
+                data1=item[0:pos]
+                data2=item[pos+1:].strip()
+                if data1 != '' and data2 != '':
+                    myresult= myresult + mydlm + "WHEN mtil.test_name like '" + data1 + "' THEN '" + data2 + "'"
+                    mydlm='\n'
+        if myresult != '':
+            myresult = ',CASE ' + myresult + ' ELSE NULL END as TestValue_Filter'
+        else:
+            myresult=',null as TestVALUE_Filter '
+    return myresult
+
+def execute(SPFExe:str, SPFInstance:int):
+    """
+    SPFExe : location of SQLPF executables
+    interactive : SPF install folder
+    SH          : SPF SW on SH drone
+    HPC         : SPF SW version folder
+    SPFInstance   : Instance# of task invoking this method
+    """
+    currdate=datetime.today()
+    __logger = logging.getLogger("SPFLib")
+    __logger.debug(f"SPFExe : {SPFExe}; SPFInstance : {SPFInstance}")
+    #myexedir0=r'<<<spf-default-exe2>>>\'[:-2]
+    #print(myexedir0); #Debug
+    sys.path.insert(0, SPFExe)
+    from spf_call_midas_hbase_async_api_v2 import call_midas_hbase_api
+    mycertfile=False
+
+    query_mode='PIVOT'              #Default
+    pivot_ssid='YES'                #Default
+    stacked_show_all_results='YES'  #Default
+    join_type='inner'               #Default Join for returning session data if there are no test results
+    return_sort_lot='MD.Sort_Lot_Prefix_Seven as Sort_Lot'
+    lotfromfs_value='FS.LOT as LOTFromFS'
+    if stacked_show_all_results != 'YES' and stacked_show_all_results != 'NO':
+        stacked_show_all_results = 'YES'
+
+    show_fuse_id='NO'  #Default
+    if show_fuse_id != 'YES' and show_fuse_id != 'NO':
+        show_fuse_id = 'NO'
+    #print('show_fuse_id=' + str(show_fuse_id));
+
+    la_value_1='!!!!!'  #Nonesense value
+
+    query_mode='RAW'       #Legacy Filter Support
+    if query_mode == 'PIVOT' or (query_mode != 'PIVOT' and query_mode != 'PIVOT-NOT-SSID' and query_mode != 'RAW' and query_mode != 'STACKED'):
+        query_mode = 'PIVOT'
+        pivot_ssid = 'YES'
+    elif query_mode == 'PIVOT-NOT-SSID':
+        pivot_ssid = 'NO'
+        query_mode = 'PIVOT'
+    elif query_mode == 'STACKED' or query_mode == 'RAW':
+        pivot_ssid = 'NO'
+        query_mode = 'RAW'
+    if query_mode == 'PIVOT':
+        test_filter="  ,mtil.test_name||'_'||OperGroup||'_'||TestName_Type as TestName_Alias"
+    else:
+        test_filter="  ,mtil.test_name as TestName_Alias"
+    if pivot_ssid == 'YES':
+        opergroup_expr="CASE WHEN MUT.Testing_Type IN ('SORT', 'SDS', 'SDT') then MUT.Operation || '_' || FS.SUBSTRUCTURE_ID WHEN MUT.SubFlowStep IS NULL THEN MUT.Operation ELSE MUT.Operation || '_' || MUT.SubFlowStep END as OperGroup"
+    else:
+        opergroup_expr="CASE WHEN MUT.SubFlowStep IS NULL THEN MUT.Operation ELSE MUT.Operation || '_' || MUT.SubFlowStep END as OperGroup"
+
+    flex_cols='''
+OReplace(mlots.program_or_bi_recipe_name,',',';')||','||COALESCE(mlots.testing_entity,'')||','||COALESCE(mut.unit_tester_site_id,'')||','||COALESCE(mut.thermal_head_id,'')||','||COALESCE(CAST(COALESCE(MUTB.Substructure_Interface_Bin, MUTB.Unit_Interface_Bin) AS VARCHAR(10)),'')||','||COALESCE(CAST(COALESCE(MUTB.Substructure_Functional_Bin, MUTB.Unit_Functional_Bin) AS VARCHAR(10)),'')||','||COALESCE(mut.tiu_personality_card_id,'')||','||COALESCE(mut.unit_tester_id,'')||','||COALESCE(mlots.testing_entity,'')  || '_'  || COALESCE(mut.unit_tester_site_id,'')||','||COALESCE(mlots.process_step,'')||','||COALESCE(mlots.owner,'')||','||COALESCE(CAST(mut.unit_testing_start_date_time AS VARCHAR(19)),'')||','||COALESCE(mutb.substructure_good_bad_flag,mutb.unit_good_bad_flag,'')
+'''
+    flex_cols=flex_cols.replace("\n","").replace("\r","").strip()
+    if flex_cols=='':
+        flex_cols="''"
+    else:
+        flex_cols='(' + flex_cols + ')'
+
+    ctr_filter=''
+    ctr_filter=parse_test_value_filter(ctr_filter,'ctr-test')
+    #print(ctr_filter); #Debug
+
+    str_filter=''
+    str_filter=parse_test_value_filter(str_filter,'str-test')
+    #print(str_filter); #Debug
+
+    raw_filter=''
+    raw_filter=parse_test_value_filter(raw_filter,'raw-test')
+    #print(raw_filter); #Debug
+
+    ptr_filter=''
+    if ptr_filter=='':
+        ptr_filter=',NULL as TestVALUE_Filter'
+    #print(ptr_filter); #Debug
+
+
+    MySPFNode='ALL.MIDAS'.upper().strip()
+    base_url = 'https://chm1px.intel.com/MidasHbaseWebApi'               #PROD
+    endpoint = '/api/v1/reports/commonreports/genericreport_async'       #PROD
+    if MySPFNode=='ALL.D2.MIDAS':  #SANDBOX
+        base_url = 'https://chm1px.intel.com/MidasHbaseWebApiSandbox'
+        endpoint = '/api/v1/reports/commonreports/genericreport_async'
+    elif MySPFNode=='ALL.D3.MIDAS':  #DEV
+        base_url = 'https://chm1px.intel.com/MidasHbaseWebApiDev'
+        endpoint = '/api/v1/reports/commonreports/genericreport_async'
+
+    rand_str = str(random.randint(1,  9000000000000000000)).strip()
+    ticket = 'SQLPF_' + os.getlogin() + '_' + rand_str + '_' + datetime.now().strftime('%m_%d_%Y_%H_%M_%S')
+
+    decompressed_output=r'vtiang_a0_6285.tab'
+    myfile_tup=os.path.splitext(decompressed_output)
+    myext=myfile_tup[1].upper()
+    if myext=='.TAB':
+        mydlm='TSV'
+        csvdlm=None
+    elif myext=='.ASC':
+        mydlm='CSV'
+        csvdlm='|'
+    elif myext == '.PARQUET':
+        mydlm='PARQUET'
+        csvdlm=None
+    else:
+        mydlm='CSV'
+        csvdlm=','
+
+    try:
+        if os.path.exists(decompressed_output):
+            os.remove(decompressed_output)
+    except Exception as e:
+        print('############################################################################')
+        print('Unable to remove output file. Check whether output file is open in Excel.\n' + str(e))
+        print('############################################################################\n')
+        sys.exit(1)
+
+    inqry = '''
+INSERT INTO sys_md_hbase.GTT_INPUT (lato_start_ww,lot,lots_seq_key,operation,testing_type,product_type_code)
+SELECT MLOTS.lato_start_ww, MLOTS.lot, MLOTS.lots_seq_key,MLOTS.operation,testing_type,product_type_code
+FROM midas.MDS_Lot_Oper_Testing_Session MLOTS
+WHERE 1=1 AND mlots.lato_valid_flag='Y' AND      (mlots.lot In 
+SQL_Get_CSV_List(".\vtiang_SQL_6285.tab", lot, "mlots.lot In") 
+ AND      (mlots.operation In 
+SQL_Get_CSV_List(".\vtiang_SQL_6285.tab", operation, "mlots.operation In") 
+;
+'''
+
+    msqry = f'''
+INSERT INTO sys_md_hbase.GTT_UNIT (Batch_Unit_Seq_Key,Assembled_Unit_Seq_Key,Substructure_ID,Die_Seq_Key,Sort_Lot,Sort_Wafer,Sort_X,Sort_Y,Lato_Start_WW,Lot,Lots_Seq_key,Visual_Id,UNIT_TYPE)
+SELECT DISTINCT DENSE_RANK() over (order by coalesce(mau.Assembled_Unit_Seq_Key, MD.die_seq_key))-1 as Batch_Unit_Seq_Key
+,Assembled_Unit_Seq_Key, CASE WHEN coalesce(mau.largest_AUI_Num_Of_Dice, 1) = 1 THEN 'U1' WHEN MD.largest_AUI_Seq_Key is null then 'X' ELSE AUI.Child_Mfd_Unit_Substructure_ID END AS Substructure_Comp, MD.Die_Seq_Key
+,{return_sort_lot}, MD.Sort_Wafer_Id, MD.Sort_X_Location, MD.Sort_Y_Location, NULL, mut.lot, NULL
+,coalesce(mau.Visual_id,'EFUSE_'||MD.Sort_Lot||'_'||lpad(MD.Sort_Wafer_ID,3,'0')||'_'||trim (cast(MD.Sort_X_Location as integer))||'_'||trim (cast( MD.Sort_Y_Location as integer)) ) as Visual_id
+,case when mau.Largest_AUI_Num_Of_Dice > 1 then 'MCP' else 'SCP' end as UNIT_TYPE
+FROM sys_md_hbase.GTT_INPUT MLOTS
+INNER JOIN midas.MDS_Unit_Testing MUT ON MUT.LATO_Start_WW = MLOTS.LATO_Start_WW AND MUT.Lot = MLOTS.Lot AND MUT.LOTS_Seq_Key = MLOTS.LOTS_Seq_Key
+INNER JOIN midas.MDS_Assembled_Unit mau ON mau.assembled_unit_seq_key=MUT.manufactured_unit_seq_key
+LEFT JOIN midas.MDS_Die MD1 ON MD1.largest_AUI_seq_key = mau.assembled_unit_seq_key
+LEFT JOIN midas.MDS_Die MD ON md.die_seq_key=md1.die_seq_key
+LEFT JOIN midas.MDS_AU_Incarnation_Child_Unit AUI ON AUI.Parent_Assembled_Unit_Seq_Key = MD.largest_AUI_seq_key AND aui.AUI_Num_Of_Dice=mau.Largest_AUI_Num_Of_Dice AND AUI.Child_Mfd_Unit_Seq_Key=MD.Die_SEQ_KEY
+WHERE Substructure_Comp IS NOT NULL
+;
+'''
+    dsqry=f'''
+INSERT INTO sys_md_hbase.GTT_DATA (
+BATCH_UNIT_SEQ_KEY
+,Visual_ID
+,OperGroup
+,LotFromFS
+,SubStructure_ID
+,Operation
+,SubFlowStep
+,LATO_Start_WW
+,Lot
+,LOTS_Seq_Key
+,Unit_Testing_Seq_Key
+,OtherFlexCols
+)
+SELECT DISTINCT fs.Batch_Unit_Seq_Key, fs.Visual_ID
+,{opergroup_expr}
+,{lotfromfs_value}
+,CASE WHEN MUT.Testing_Type IN ('SORT', 'SDS', 'SDT') then FS.SUBSTRUCTURE_ID else 'UNIT' END AS SUBSTRUCTURE_ID
+,MUT.OPERATION, MUT.SubFlowStep, MUT.LATO_Start_WW, MUT.Lot, MUT.LOTS_Seq_Key, MUT.Unit_Testing_Seq_Key
+,{flex_cols} as OtherFlexCols
+FROM  sys_md_hbase.GTT_UNIT FS
+INNER JOIN MIDAS.MDS_Unit_Testing MUT ON MUT.Manufactured_Unit_Seq_Key = FS.Assembled_Unit_Seq_Key AND MUT.LATO_Valid_Flag = 'Y' AND      COALESCE(mut.VF_Operation_SFS_Latest_Flag, mut.VF_Operation_Final_Latest_Flag) = 'Y' 
+ AND      (mut.operation In 
+SQL_Get_CSV_List(".\vtiang_SQL_6285.tab", operation, "mut.operation In") 
+INNER JOIN MIDAS.MDS_Unit_Testing_BINS MUTB ON MUTB.lato_start_ww = MUT.lato_start_ww AND MUTB.lot = MUT.lot AND MUTB.lots_seq_key = MUT.lots_seq_key AND MUTB.unit_testing_seq_key = MUT.unit_testing_seq_key AND MUTB.SUBSTRUCTURE_ID='UNIT' AND      COALESCE(mutb.substructure_good_bad_flag,mutb.unit_good_bad_flag,'') = 'G' 
+INNER JOIN MIDAS.MDS_LOT_OPER_TESTING_SESSION MLOTS ON MLOTS.LATO_Start_WW=MUT.LATO_Start_WW and MLOTS.Lot=MUT.Lot and MLOTS.LOTS_Seq_Key=MUT.LOTS_Seq_Key
+WHERE
+              COALESCE(mlots.process_step,'') In ('CLASSHOT'
+,'C') 
+;
+'''
+
+    dsqry_flexcol_header= """
+program_or_bi_recipe,testing_entity,unit_tester_site_id,thermal_head_id,unit_interface_bin,unit_functional_bin,tiu_personality_card_id,unit_tester_id,hdmx_cell,process_step,owner,unit_test_start_date,unit_good_bad_flag
+"""
+    dsqry_flexcol_header=dsqry_flexcol_header.replace('\n','').replace('\r','')
+
+
+    tname=''
+    tname=f"""
+INSERT INTO sys_md_hbase.GTT_TESTNAME (
+TestName_Type
+, OPERGROUP
+, TestName
+, TestVALUE_Filter
+, TestVALUE_ParseScheme
+, TestName_Alias
+)
+WITH MLOTS as (SELECT DISTINCT LATO_Start_WW, Lot, LOTS_Seq_Key, OperGroup, Operation, SubFlowStep FROM sys_md_hbase.GTT_DATA )
+SELECT DISTINCT 'STR' as TestName_Type, OperGroup, mtil.test_name
+{str_filter}
+,null as ParsingScheme
+{test_filter}
+FROM MLOTS
+INNER JOIN mds_test_in_lots mtil ON mtil.lato_start_ww=MLOTS.LATO_Start_WW AND mtil.lot=MLOTS.lot AND mtil.Lots_Seq_key=MLOTS.Lots_Seq_Key
+INNER JOIN mds_test mt ON mt.test_seq_key=mtil.test_seq_key AND mt.String_Test_Result_Flag='Y'
+WHERE
+              (mtil.test_name LIKE  '<<<Vmin_token>>>'
+) 
+"""
+    process_counters=''; counter_data=''
+
+    if tname != '':
+        tname = tname + '\n;'
+    #print(tname) #Debug
+
+    tname_value_filter=''
+    output_format = query_mode # PIVOT, PIVOT-SSID, STACK, JOIN, RAW
+    exec_mode = 'SINGLE'
+    pf_output_columns=''
+
+    payload = json.dumps({
+'ctx': {
+'caller_app': 'SQLPF',
+},
+'ticket': ticket,
+'inpqry': inqry,
+'msqry' : msqry,
+'dsqry': dsqry,
+'dsqry_flexcol_header':  dsqry_flexcol_header,
+'tname': tname,
+'tname_value_filter': tname_value_filter,
+'output_format': output_format,
+'pivot_ssid': pivot_ssid,
+'show_all_test_results': stacked_show_all_results,
+'fuse_id_display': show_fuse_id,
+'pf_output_columns': pf_output_columns,
+'output_file_format': mydlm,
+'csv_output_delimiter': csvdlm,
+'exec_mode': exec_mode,
+'join_type': join_type
+})
+
+    if __logger.level == 10: # debug mode is ON
+        try:
+            payload_file=f'spf_midas_{SPFInstance}.json'
+            with open(payload_file, 'w') as f:
+                f.write(payload)
+        except:
+            pass
+
+    call_midas_hbase_api(ticket, base_url, endpoint, payload, decompressed_output, mycertfile, currdate, dsqry_flexcol_header)
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/RESET=Y
+/NODE=.\
+/OLEDB=SQLite
+/ENGINE=SQLite
+/UN=
+/PW=
+/WORKDIR=.\
+/T=No
+/TS=_20240830103150
+/CSV=rawdata.csv
+/TABLE=vtiang_SQL_6285.tab,vtiang_a0_6285.tab
+/HEADERS=fac_lot,facility,lot,operation,prod,devrevstep,total_tested,program_or_recipe,test_end_date,load_end_date,current_ts,Column-Pattern->[[Y<;>a0<;>vtiang_a0_6285<dot>tab<;>Regex<;><dot>*<;>|<>|<;>]]
+/DELETE=*Instance*
+/INSTANCE=6285
+/USE_LEGACY_PIVOT_HEADERS=Y
+/SQLITE_DT=,fac_lot(c),facility(c),lot(c),operation(c),prod(c),devrevstep(c),total_tested(c),program_or_recipe(c),test_end_date(c),load_end_date(c),current_ts(c)
+/QUOTECSV=Y
+/EMPTY_TO_NULL=Y
+/HADOOP_SERVER_DEFAULT=ATD_ATM.HADOOP
+</OPTIONS>
+
+
+DROP INDEX IF EXISTS IdxA0;
+Create Index IF NOT EXISTS IdxA0 ON [vtiang_a0_6285] ([LOTFROMFS]);
+
+SELECT /*L0*/  DISTINCT 
+          sql.[fac_lot] AS [fac_lot]
+         ,sql.[facility] AS [facility]
+         ,sql.[lot] AS [lot]
+         ,sql.[operation] AS [operation]
+         ,sql.[prod] AS [prod]
+         ,sql.[devrevstep] AS [devrevstep]
+         ,sql.[total_tested] AS [total_tested]
+         ,sql.[program_or_recipe] AS [program_or_recipe]
+         ,sql.[test_end_date] AS [test_end_date]
+         ,sql.[load_end_date] AS [load_end_date]
+         ,sql.[current_ts] AS [current_ts]
+         ,Column-Pattern->[[Y<;>a0<;>vtiang_a0_6285<dot>tab<;>Regex<;><dot>*<;>|<>|<;>]]
+FROM 
+           [vtiang_SQL_6285] sql
+ LEFT OUTER JOIN [vtiang_a0_6285] a0
+  ON sql.[lot] = a0.[LOTFROMFS]
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={ROWS-IN-FILE} "rawdata.csv" "rowcount_rawdata" "N"
+/PROMPT-TEXT=Step 15. Count Rows in a File
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={IF-THEN} "rowcount_rawdata" "GT" "50" "" "" "" ""
+/PROMPT-TEXT=Step 16. Apply Conditional Logic
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WRITE-FILE=Y
+/INSTANCE=6285
+/PROMPT-TEXT=Step 17-1. Write Text to a file. Optionally use <EOF> to mark end of file
+/CSV=type1_decoder.py
+</OPTIONS>
+
+print('!!!running script:Vmin_decoder_type1_start!!!')
+#to remove unnecessary columns from HBASE output, then remove duplicate rows, generate blank Vmin file when missing critical columns, filter out non numeric Vmin result during decoding.
+#to concatenate test_result from different test_name to single column
+#script copied from Nah, Ka Aik, and updated to have csv as input and output file . Also updated to enable multiple UPS token concatenation.
+import pandas as pd
+import numpy as np
+in_path=r'rawdata.csv' # input file path, you will need to change this line accordingly
+out_path=r'Vmin.csv' #output path , change accordingly
+df_0 = pd.read_csv(in_path,dtype={'visual_id':str})
+
+key_collist=['fac_lot','facility','lot','operation','prod','devrevstep','total_tested','program_or_recipe','test_end_date','load_end_date','current_ts','visual_id','unit_interface_bin','unit_functional_bin','unit_test_start_date','thermal_head_id','tiu_personality_card_id','unit_tester_id','testing_entity','hdmx_cell','test_name','test_result']
+
+df_0=df_0.rename(columns=lambda col: col.strip().lower())# change col names to lowercase onldf_s
+
+
+try:
+    df_in=df_0[key_collist]
+except KeyError:
+    print("missing key columns")
+    with open('Vmin.csv','w') as f:
+        pass
+else:
+    df_in.drop_duplicates(inplace=True)
+    df_in.sort_values(by=['visual_id','test_name'], ascending=True,inplace=True)
+    #get original column list& original test_name list
+    clist=df_in.columns.to_list()
+    clist.remove('test_result')
+    clist.remove('test_name')
+
+    #concatenate test name and also string result for each unit
+    def conc_row(alist):
+        return ''.join(alist)
+
+    df_str=df_in.groupby(by=clist,as_index=True)['test_result'].apply(conc_row)
+    df_tn=df_in.groupby(by=clist,as_index=True)['test_name'].apply(conc_row)
+    df_conc=pd.merge(df_tn.reset_index(),df_str.reset_index(),on=clist,how="inner")
+    df_conc.to_csv('df.csv',index=False)
+
+
+    temp_path=r'df.csv' # input file path, you will need to change this line accordingly
+
+    f=open(temp_path,'r')
+    lines=f.readlines()
+
+    outcsv=open(out_path,'w') #output file
+
+    titles=lines[0].strip().split(',') # remove '\n' and split with ,
+
+    wLine=lines[0].strip()+',domain_frequency_core,vmin\n'
+    outcsv.write(wLine) #write title
+
+    del(lines[0]) # del title from raw data
+
+    import re
+
+    VminFormat = re.compile(r"^-?\d*(?:\.\d+)?$")
+
+    def isValidVminFormat(value):
+        if VminFormat.match(value) != None:
+            return True
+        else:
+            return False
+
+
+    for i in lines:
+        myRows = i.strip().split(',')
+        if myRows[titles.index('test_result')]:
+            a = myRows[titles.index('test_result')].strip().split('_')
+            for j in a:
+                b = j.strip().split(':')
+                c = b[1].strip().split('%')
+
+                for k in c:
+                    d = k.strip().split('^')
+                    e = d[1].strip().split('V')
+                    if len(e) > 1:
+                        core = 0
+                        for l in e:
+                            if isValidVminFormat(l):
+                                outcsv.write( i.strip() + ',Vmin@' + b[0] + '@' + d[0] + '@' + str(core) + ',' + l +'\n')
+                            core += 1
+                    else:
+                        if isValidVminFormat(e[0]):
+                            outcsv.write( i.strip() + ',Vmin@' + b[0] + '@' + d[0] + '@,' + e[0] +'\n')
+    outcsv.close()
+    f.close()
+    print('Refer to: ',out_path,'for output file')
+    print('!!!Completed!!!')    
+    
+
+
+<---- New Query ---->
+<OPTIONS>
+/WRITE-FILE=Y
+/INSTANCE=6285
+/PROMPT-TEXT=Step 17-2. Write Text to a file. Optionally use <EOF> to mark end of file
+/CSV=type2_decoder.py
+</OPTIONS>
+
+print('!!!running script:type2_decoder_start!!!')
+#to remove unnecessary columns from HBASE output, then remove duplicate rows, generate blank Vmin file when missing critical columns, filter out non numeric Vmin result during decoding.
+#script copied from Nah, Ka Aik, and updated to have csv as input and output file . Also updated to enable multiple UPS token concatenation.
+import pandas as pd
+import numpy as np
+in_path=r'rawdata.csv' # input file path, you will need to change this line accordingly
+out_path=r'Vmin.csv' #output path , change accordingly
+df_0 = pd.read_csv(in_path,dtype={'visual_id':str})
+
+key_collist=['fac_lot','facility','lot','operation','prod','devrevstep','total_tested','program_or_recipe','test_end_date','load_end_date','current_ts','visual_id','unit_interface_bin','unit_functional_bin','unit_test_start_date','thermal_head_id','tiu_personality_card_id','unit_tester_id','testing_entity','hdmx_cell','test_name','test_result']
+
+df_0=df_0.rename(columns=lambda col: col.strip().lower())# change col names to lowercase onldf_s
+
+
+try:
+    df_in=df_0[key_collist]
+except KeyError:
+    print("missing key columns")
+    with open('Vmin.csv','w') as f:
+        pass
+else:
+    df_in.drop_duplicates(inplace=True)  
+    
+
+    df_in.to_csv('df.csv',index=False)
+
+
+    temp_path=r'df.csv' # input file path, you will need to change this line accordingly
+
+    f=open(temp_path,'r')
+
+    lines=f.readlines()
+
+    outcsv=open(out_path,'w') #output file
+
+    titles=lines[0].strip().split(',') # remove '\n' and split with ,
+
+    wLine=lines[0].strip()+',domain_frequency_core,vmin\n'
+    outcsv.write(wLine) #write title
+
+    del(lines[0]) # del title from raw data
+
+    import re
+
+    VminFormat = re.compile(r"^-?\d*(?:\.\d+)?$")
+
+    def isValidVminFormat(value):
+        if VminFormat.match(value) != None:
+            return True
+        else:
+            return False
+
+
+    for i in lines:
+        myRows = i.strip().split(',')
+        if myRows[titles.index('test_result')]:
+            a = myRows[titles.index('test_result')].strip().split('_')
+            for j in a:
+                b = j.strip().split(':')
+                c = b[1].strip().split('%')
+
+                for k in c:
+                    d = k.strip().split('^')
+                    e = d[1].strip().split('V')
+                    if len(e) > 1:
+                        core = 0
+                        for l in e:
+                            if isValidVminFormat(l):
+                                outcsv.write( i.strip() + ',Vmin@' + b[0] + '@' + d[0] + '@' + str(core) + ',' + l +'\n')
+                            core += 1
+                    else:
+                        if isValidVminFormat(e[0]):
+                            outcsv.write( i.strip() + ',Vmin@' + b[0] + '@' + d[0] + '@,' + e[0] +'\n')
+    outcsv.close()
+    f.close()
+    print('Refer to: ',out_path,'for output file')
+    print('!!!Completed!!!')
+
+<---- New Query ---->
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={IF-THEN} "VAR(<<<decode_script>>>)" "EQS" "type1" "" "" "" ""
+/PROMPT-TEXT=Step 17-3. Apply Conditional Logic
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\Run_Python_Script.va "type1_decoder.py" "" "N" "atd_atm.hadoop" "Python-v3"
+/PROMPT-TEXT=Step 17-4. Run Python script
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={ELSE}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={IF-THEN} "VAR(<<<decode_script>>>)" "EQS" "type2" "" "" "" ""
+/PROMPT-TEXT=Step 17-5. Apply Conditional Logic
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\Run_Python_Script.va "type2_decoder.py" "" "N" "atd_atm.hadoop" "Python-v3"
+/PROMPT-TEXT=Step 17-6. Run Python script
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={END-IF}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={END-IF}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\WaitFile.va "Vmin.csv" "30"
+/PROMPT-TEXT=Step 17-7. Wait for a file to appear or a period of time to elapse
+</OPTIONS>
+
+
+<---- New Query ---->
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={ROWS-IN-FILE} "Vmin.csv" "RowsInFile_Vmin" "N"
+/PROMPT-TEXT=Step 18. Count Rows in a File
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={IF-THEN} "RowsInFile_Vmin" "GT" "0" "" "" "" ""
+/PROMPT-TEXT=Step 19. Apply Conditional Logic
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WRITE-FILE=Y
+/INSTANCE=6285
+/PROMPT-TEXT=Step 20-1. Write Text to a file. Optionally use <EOF> to mark end of file
+/CSV=Vmin_computer3.py
+</OPTIONS>
+
+print('!!!running script:Vmin_computer3_start!!!')
+
+#rev0 compare shift based on median distribution, meanwhile adding requirement on shift delta for p25 and p75 to handle skewed distributioned, adding sample size requirement to exclude noise induced by small sample size.
+import pandas as pd
+import numpy as np
+
+
+
+raw_file = r"Vmin.csv"
+df_raw = pd.read_csv(raw_file,dtype={'visualid':str})
+
+
+df_filtered=df_raw.loc[(df_raw["vmin"]<=100)&(df_raw["vmin"]>=0)]
+list_hw=["thermal_head_id","tiu_personality_card_id","unit_tester_id"]
+limit=[<<<delta>>>,<<<x_iqr>>>,<<<ss_target>>>,<<<ss_rest>>>]
+
+df_hw_stack=df_filtered[list_hw].stack().rename("hw_name")
+df_filtered.drop(list_hw, axis=1,inplace=True)
+df_stack=df_filtered.merge(df_hw_stack.reset_index(),how="left",left_index=True, right_on="level_0") 
+df_stack.rename(columns = {'level_1':'hw_type'},inplace=True)
+df_stack.drop("level_0", axis=1,inplace=True)
+
+def vmin_compare(df,limit):#limit is [x of Med_targetIQR..... ]
+    hw_names=np.unique(df["hw_name"].values)
+    for item in  hw_names:
+        df_target=df.loc[df["hw_name"]==item]  # get all target SS
+        df_rest=df.loc[df["hw_name"]!=item]  # get all rest SS
+
+        med_target=df_target["vmin"].median(skipna=True)
+        ss_target=len(df_target)
+        med_rest=df_rest["vmin"].median(skipna=True)
+        ss_rest=len(df_rest)
+        p75_target=df_target["vmin"].quantile(q=0.75)
+        p25_target=df_target["vmin"].quantile(q=0.25)
+        p75_rest=df_rest["vmin"].quantile(q=0.75)
+        p25_rest=df_rest["vmin"].quantile(q=0.25)
+        iqr_rest=p75_rest-p25_rest
+        delta_med=med_target-med_rest
+        delta_p25=p25_target-p25_rest
+        delta_p75=p75_target-p75_rest
+        
+        if delta_med==0 or delta_p25==0 or delta_p75==0:
+            x_iqr=0
+        elif iqr_rest==0:
+            x_iqr=999
+        else:
+            x_iqr=delta_med/iqr_rest
+            x_iqr_p25=delta_p25/iqr_rest
+            x_iqr_p75=delta_p75/iqr_rest
+#to judge whether any distribution shift meet pre-defined limit 
+        if -(delta_med)> float(limit[0]) and -(delta_p25)> float(limit[0]) and -(delta_p75)> float(limit[0]) and  -(x_iqr)>=float(limit[1]) and -(x_iqr_p25)>=float(limit[1]) and -(x_iqr_p75)>=float(limit[1]) and ss_target> float(limit[2]) and ss_rest> float(limit[3]):
+            flag="I_trigger"
+        elif -(delta_med)> float(limit[0]) and -(delta_p25)> float(limit[0]) and -(delta_p75)> float(limit[0]) and  -(x_iqr)>=float(limit[1]) and -(x_iqr_p25)>=float(limit[1]) and -(x_iqr_p75)>=float(limit[1]) and ss_target<= float(limit[2]) and ss_target > float(limit[3]):
+            flag="S_low_ss"
+        else:
+            flag="N_not_trigger"
+        yield [item,ss_target,p25_target,med_target,p75_target,ss_rest,p25_rest,med_rest,p75_rest,iqr_rest,delta_med,x_iqr,delta_p25,delta_p75,flag]
+
+
+
+
+rslts = []
+list_loop=["fac_lot","test_name","domain_frequency_core","testing_entity","hw_type"]
+rslt_cols = list_loop + ["hw_name", "ss_target","p25_target","med_target","p75_target","ss_rest","p25_rest","med_rest","p75_rest","iqr_rest","delta_med","x_iqr","delta_p25","delta_p75","flag"]
+
+for grp in df_stack.groupby(by=list_loop):
+    for rslt in vmin_compare(grp[1],limit):
+        rslts.append(dict(zip(rslt_cols, list(grp[0]) + rslt)))
+        
+rslt_df = pd.DataFrame(rslts)
+rslt_df.sort_values(by='flag', ascending=True,inplace=True)
+rslt_df.to_csv("vmin_result0.csv", index=False)
+print('Completed!!!')
+
+print(limit)
+<---- New Query ---->
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\Run_Python_Script.va "Vmin_computer3.py" "" "N" "atd_atm.hadoop" "Python-v3"
+/PROMPT-TEXT=Step 20-2. Run Python script
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\WaitFile.va "vmin_result0.csv" "30"
+/PROMPT-TEXT=Step 20-3. Wait for a file to appear or a period of time to elapse
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/NODE=.\
+/OLEDB=SQLite
+/ENGINE=SQLite
+/UN=
+/PW=
+/WORKDIR=.\
+/T=No
+/TS=_20240830103150
+/CSV=vmin_result.csv
+/TABLE=vmin_result0.csv
+/HEADERS=fac_lot,test_name,domain_frequency_core,testing_entity,hw_type,hw_name,ss_target,p25_target,med_target,p75_target,ss_rest,p25_rest,med_rest,p75_rest,iqr_rest,delta_med,x_iqr,delta_p25,delta_p75,flag
+/INSTANCE=6285
+/USE_LEGACY_PIVOT_HEADERS=Y
+/PROMPT-TEXT=Step 20-4.1. Fetching Text (SQLite) Data
+/HEADERS_UNIQUE=Y
+/QUOTECSV=Y
+/HADOOP_SERVER_DEFAULT=ATD_ATM.HADOOP
+</OPTIONS>
+
+SELECT /*L0*/  DISTINCT 
+          a0.[fac_lot] AS [fac_lot]
+         ,a0.[test_name] AS [test_name]
+         ,a0.[domain_frequency_core] AS [domain_frequency_core]
+         ,a0.[testing_entity] AS [testing_entity]
+         ,a0.[hw_type] AS [hw_type]
+         ,a0.[hw_name] AS [hw_name]
+         ,a0.[ss_target] AS [ss_target]
+         ,a0.[p25_target] AS [p25_target]
+         ,a0.[med_target] AS [med_target]
+         ,a0.[p75_target] AS [p75_target]
+         ,a0.[ss_rest] AS [ss_rest]
+         ,a0.[p25_rest] AS [p25_rest]
+         ,a0.[med_rest] AS [med_rest]
+         ,a0.[p75_rest] AS [p75_rest]
+         ,a0.[iqr_rest] AS [iqr_rest]
+         ,a0.[delta_med] AS [delta_med]
+         ,a0.[x_iqr] AS [x_iqr]
+         ,a0.[delta_p25] AS [delta_p25]
+         ,a0.[delta_p75] AS [delta_p75]
+         ,a0.[flag] AS [flag]
+FROM 
+[vmin_result0] a0
+WHERE
+ NOT          a0.[domain_frequency_core] In ('<<<exclusion>>>')
+<---- New Query ---->
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={VALUE-IN-FILE} "vmin_result.csv" "Vmin_shift_flag" "flag"
+/PROMPT-TEXT=Step 21. Retrieve a column value in a File
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={IF-THEN} "Vmin_shift_flag" "NES" "DUMMY" "" "" "" ""
+/PROMPT-TEXT=Step 22. Apply Conditional Logic
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\RoboCopy.va "vmin_result.csv,Vmin.csv,rawdata.csv" "." "\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group\HIST" "100" "30" "Y" "" "N"
+/PROMPT-TEXT=Step 23-1. Robocopy Files/Folders
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\SPFRename.va "\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group\HIST\rawdata.csv" "\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group\HIST\rawdata_<TS>.csv"
+/PROMPT-TEXT=Step 23-2. Rename Files
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\SPFRename.va "\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group\HIST\Vmin.csv" "\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group\HIST\Vmin_<TS>.csv"
+/PROMPT-TEXT=Step 23-3. Rename Files
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\SPFRename.va "\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group\HIST\vmin_result.csv" "\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group\HIST\vmin_result_<TS>.csv"
+/PROMPT-TEXT=Step 23-4. Rename Files
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={END-IF}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={ELSE}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+
+<---- New Query ---->
+<OPTIONS>
+/REPORT=HTML-RUN
+/INSTANCE=6285
+/PROMPT-TEXT=Step 24-1. Create an HTML Report
+/APP_SERVER_DEFAULT=atd_atm.hadoop
+</OPTIONS>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Type<\\>Key<\\>COL1<\\>COL2<\\>COL3<\\>COL4<\\>COL5<\\>COL6<\\>COL7<\\>COL8
+TYPE<\\>CSS<\\><\\><\\><\\><\\><\\><\\><\\>
+CSS<\\>sqlpathfinder_style_1.css<\\><\\><\\><\\><\\><\\><\\><\\>
+FORMAT<\\>Column-Headers<\\>background-color:#dbd9c0<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>font-weight:bold<\\>text-align:left<\\>text-decoration:normal<\\>vertical-align:middle
+FORMAT<\\>Column-Data<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>text-align:left<\\>vertical-align:middle<\\>
+FORMAT<\\>Column-Alt-Row<\\>background-color:#f7f5dc<\\>color:#333<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>text-align:left<\\>vertical-align:middle<\\>
+FORMAT<\\>At-Top-of-Report<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:15<\\>font-style:normal<\\>font-weight:bold<\\>text-align:center<\\>vertical-align:middle
+FORMAT<\\>At-Top-of-Col1<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>font-weight:bold<\\>text-align:left<\\>vertical-align:middle
+FORMAT<\\>At-Top-of-Col2<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>font-weight:bold<\\>text-align:left<\\>vertical-align:middle
+FORMAT<\\>At-Top-of-Col3<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>font-weight:bold<\\>text-align:left<\\>vertical-align:middle
+FORMAT<\\>JQX-All-IChart-Text<\\>background-color:white<\\>color:black<\\>font-family:Verdana<\\>font-size:11<\\>font-style:normal<\\>font-weight:normal<\\>text-align:left<\\>vertical-align:middle
+FORMAT<\\>COLUMN-BORDER<\\>border-color:#cc9<\\>border-collapse:collapse<\\>border-style:solid<\\>border-width:1px<\\>border-spacing:4px<\\><\\><\\>
+<---- New Query ---->
+<OPTIONS>
+/INSTANCE=6285
+/ID=MYREPORT2
+/REPORT=HTML-DEFER
+/APP_SERVER_DEFAULT=atd_atm.hadoop
+</OPTIONS>
+
+
+
+
+
+Type<\\>Key<\\>COL1<\\>COL2<\\>COL3<\\>COL4<\\>COL5<\\>COL6<\\>COL7<\\>COL8<\\>COL9<\\>COL10<\\>COL11<\\>COL12
+TYPE<\\>HTML<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+INPUT-FILE<\\>last_hrs_lot_scan_temp.csv<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+OUTPUT-FILE<\\>SQLPathFinder.htm<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+CSS<\\>sqlpathfinder_style_1.css<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+COLSPAN<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+DRILLDOWN<\\>N<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+DYNAMICSORT<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+DYNAMICFILTER<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+ATTOPDRILLDOWN<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+NOPREPROCESS<\\>Y<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+COLUMN-DATA<\\><\\>facility<\\>fac_lot<\\>lot<\\>operation<\\>prod<\\>devrevstep<\\>program_or_recipe<\\>total_tested<\\>test_end_date<\\>load_end_date<\\>current_ts<\\>
+COLUMN-HEADERS<\\><\\>Facility<\\>Fac Lot<\\>Lot<\\>Operation<\\>Prod<\\>Devrevstep<\\>Program Or Recipe<\\>Total Tested<\\>Test End Date<\\>Load End Date<\\>Current Ts<\\>
+COLUMN-ALIGNMENT<\\><\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>
+COLUMN-FORMAT<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+<---- New Query ---->
+<OPTIONS>
+/REPORT=HTML-LAYOUT
+/OUTLOOK=Y
+/INSTANCE=6285
+/JSON-ONLY=N
+/CHART-INSTANCE=13726
+/APP_SERVER_DEFAULT=atd_atm.hadoop
+</OPTIONS>
+<table class="tblout"><tr class="tblout"><td class="tblout" valign="top">
+:FILE:EMAIL:self
+:CSS:sqlpathfinder_style_1.css
+:CSSEMBED:N
+:RR:NO
+:B:N
+:EM-A:rawdata.csv
+:EM-S:
+:SEC:Y
+:TITLE:Scripting_Alert_Vmin_rawdata_missing_key_columns_A01
+<table class="tblout">
+<tr class="tblout">
+<td class="tblout">
+HTM:MYREPORT2
+</td>
+</tr>
+<tr class="tblout">
+<td class="tblout">
+<p style="text-align: left" style="background-color: white"><font face="Verdana" size="4" color="black">This error meas lot has midas upload, but can not found related unit level data in in HBASE/Midas. Possible RC (but not limited to) is no passing record from latest ClassHot testing result, thus no Vmin data return in unit level; or, no related token result uploaded at all.<br><br>Please root cause it if consistantly saw similar error reported.<br><br>Recommendation: check whether the config file setting is correct; if yes, whether key Vmin data is uploaded to HBASE/Midas. <br></font>
+</td>
+</tr>
+</table>
+</td><td class="tblout" valign="top">
+<table class="tblout">
+<tr class="tblout"><td class="tblout"></td></tr>
+</table>
+</td></tr></table>
+<---- New Query ---->
+<OPTIONS>
+/REPORT=HTML-DELETE
+/INSTANCE=6285
+</OPTIONS>
+N/A
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={END-IF}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={ELSE}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+
+<---- New Query ---->
+<OPTIONS>
+/REPORT=HTML-RUN
+/INSTANCE=6285
+/PROMPT-TEXT=Step 25-1. Create an HTML Report
+/APP_SERVER_DEFAULT=atd_atm.hadoop
+</OPTIONS>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Type<\\>Key<\\>COL1<\\>COL2<\\>COL3<\\>COL4<\\>COL5<\\>COL6<\\>COL7<\\>COL8
+TYPE<\\>CSS<\\><\\><\\><\\><\\><\\><\\><\\>
+CSS<\\>sqlpathfinder_style_1.css<\\><\\><\\><\\><\\><\\><\\><\\>
+FORMAT<\\>Column-Headers<\\>background-color:#dbd9c0<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>font-weight:bold<\\>text-align:left<\\>text-decoration:normal<\\>vertical-align:middle
+FORMAT<\\>Column-Data<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>text-align:left<\\>vertical-align:middle<\\>
+FORMAT<\\>Column-Alt-Row<\\>background-color:#f7f5dc<\\>color:#333<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>text-align:left<\\>vertical-align:middle<\\>
+FORMAT<\\>At-Top-of-Report<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:15<\\>font-style:normal<\\>font-weight:bold<\\>text-align:center<\\>vertical-align:middle
+FORMAT<\\>At-Top-of-Col1<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>font-weight:bold<\\>text-align:left<\\>vertical-align:middle
+FORMAT<\\>At-Top-of-Col2<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>font-weight:bold<\\>text-align:left<\\>vertical-align:middle
+FORMAT<\\>At-Top-of-Col3<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>font-weight:bold<\\>text-align:left<\\>vertical-align:middle
+FORMAT<\\>JQX-All-IChart-Text<\\>background-color:white<\\>color:black<\\>font-family:Verdana<\\>font-size:11<\\>font-style:normal<\\>font-weight:normal<\\>text-align:left<\\>vertical-align:middle
+FORMAT<\\>COLUMN-BORDER<\\>border-color:#cc9<\\>border-collapse:collapse<\\>border-style:solid<\\>border-width:1px<\\>border-spacing:4px<\\><\\><\\>
+<---- New Query ---->
+<OPTIONS>
+/INSTANCE=6285
+/ID=MYREPORT2
+/REPORT=HTML-DEFER
+/APP_SERVER_DEFAULT=atd_atm.hadoop
+</OPTIONS>
+
+
+Type<\\>Key<\\>COL1<\\>COL2<\\>COL3<\\>COL4<\\>COL5<\\>COL6<\\>COL7<\\>COL8<\\>COL9<\\>COL10<\\>COL11<\\>COL12
+TYPE<\\>HTML<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+INPUT-FILE<\\>last_hrs_lot_scan_temp.csv<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+OUTPUT-FILE<\\>SQLPathFinder.htm<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+CSS<\\>sqlpathfinder_style_1.css<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+COLSPAN<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+DRILLDOWN<\\>N<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+DYNAMICSORT<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+DYNAMICFILTER<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+ATTOPDRILLDOWN<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+NOPREPROCESS<\\>Y<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+COLUMN-DATA<\\><\\>facility<\\>fac_lot<\\>lot<\\>operation<\\>prod<\\>devrevstep<\\>program_or_recipe<\\>total_tested<\\>test_end_date<\\>load_end_date<\\>current_ts<\\>
+COLUMN-HEADERS<\\><\\>Facility<\\>Fac Lot<\\>Lot<\\>Operation<\\>Prod<\\>Devrevstep<\\>Program Or Recipe<\\>Total Tested<\\>Test End Date<\\>Load End Date<\\>Current Ts<\\>
+COLUMN-ALIGNMENT<\\><\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>
+COLUMN-FORMAT<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+<---- New Query ---->
+<OPTIONS>
+/REPORT=HTML-LAYOUT
+/OUTLOOK=Y
+/INSTANCE=6285
+/JSON-ONLY=N
+/CHART-INSTANCE=13726
+/APP_SERVER_DEFAULT=atd_atm.hadoop
+</OPTIONS>
+<table class="tblout"><tr class="tblout"><td class="tblout" valign="top">
+:FILE:EMAIL:self
+:CSS:sqlpathfinder_style_1.css
+:CSSEMBED:N
+:RR:NO
+:B:N
+:EM-A:rawdata.csv
+:EM-S:
+:SEC:Y
+:TITLE:Scripting_Alert_Vmin_rawdata_missing_A01
+<table class="tblout">
+<tr class="tblout">
+<td class="tblout">
+HTM:MYREPORT2
+</td>
+</tr>
+<tr class="tblout">
+<td class="tblout">
+<p style="text-align: center" style="background-color: white"><font face="Verdana" size="4" color="black">Please root cause it if consistantly saw similar error reported.<br><br>Recommandation: check whether the config file setting is correct. This error meas lot has midas upload, but can not found related unit level data in Midas. Possible RC (but not limited to) is no passing record from latest ClassHot testing result, thus no Vmin data return in unit level.</font>
+</td>
+</tr>
+</table>
+</td><td class="tblout" valign="top">
+<table class="tblout">
+<tr class="tblout"><td class="tblout"></td></tr>
+</table>
+</td></tr></table>
+<---- New Query ---->
+<OPTIONS>
+/REPORT=HTML-DELETE
+/INSTANCE=6285
+</OPTIONS>
+N/A
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={END-IF}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={ROWS-IN-FILE} "vmin_result.csv" "RowsInFile_result" "N"
+/PROMPT-TEXT=Step 26-1. Count Rows in a File
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={IF-THEN} "RowsInFile_result" "GT" "0" "" "" "" ""
+/PROMPT-TEXT=Step 26-2. Apply Conditional Logic
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES=@EXEDIR@\SmartAppend.va "\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group\old_scan_lot_list.csv" "last_hrs_lot_scan_temp.csv" "" "" "" "N" "N" "" "Version 3" "ATD_ATM.HADOOP" ""
+/PROMPT-TEXT=Step 26-3. Smart-Append Data
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={ELSE}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+
+<---- New Query ---->
+<OPTIONS>
+/REPORT=HTML-RUN
+/INSTANCE=6285
+/PROMPT-TEXT=Step 26-4. Create an HTML Report
+/APP_SERVER_DEFAULT=atd_atm.hadoop
+</OPTIONS>
+
+
+
+
+
+
+
+
+
+
+
+
+Type<\\>Key<\\>COL1<\\>COL2<\\>COL3<\\>COL4<\\>COL5<\\>COL6<\\>COL7<\\>COL8
+TYPE<\\>CSS<\\><\\><\\><\\><\\><\\><\\><\\>
+CSS<\\>sqlpathfinder_style_1.css<\\><\\><\\><\\><\\><\\><\\><\\>
+FORMAT<\\>Column-Headers<\\>background-color:#dbd9c0<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>font-weight:bold<\\>text-align:left<\\>text-decoration:normal<\\>vertical-align:middle
+FORMAT<\\>Column-Data<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>text-align:left<\\>vertical-align:middle<\\>
+FORMAT<\\>Column-Alt-Row<\\>background-color:#f7f5dc<\\>color:#333<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>text-align:left<\\>vertical-align:middle<\\>
+FORMAT<\\>At-Top-of-Report<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:15<\\>font-style:normal<\\>font-weight:bold<\\>text-align:center<\\>vertical-align:middle
+FORMAT<\\>At-Top-of-Col1<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>font-weight:bold<\\>text-align:left<\\>vertical-align:middle
+FORMAT<\\>At-Top-of-Col2<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>font-weight:bold<\\>text-align:left<\\>vertical-align:middle
+FORMAT<\\>At-Top-of-Col3<\\>background-color:white<\\>color:#444<\\>font-family:Arial<\\>font-size:12<\\>font-style:normal<\\>font-weight:bold<\\>text-align:left<\\>vertical-align:middle
+FORMAT<\\>JQX-All-IChart-Text<\\>background-color:white<\\>color:black<\\>font-family:Verdana<\\>font-size:11<\\>font-style:normal<\\>font-weight:normal<\\>text-align:left<\\>vertical-align:middle
+FORMAT<\\>COLUMN-BORDER<\\>border-color:#cc9<\\>border-collapse:collapse<\\>border-style:solid<\\>border-width:1px<\\>border-spacing:4px<\\><\\><\\>
+<---- New Query ---->
+<OPTIONS>
+/INSTANCE=6285
+/ID=MYREPORT2
+/REPORT=HTML-DEFER
+/APP_SERVER_DEFAULT=atd_atm.hadoop
+</OPTIONS>
+
+
+
+
+
+
+
+
+
+
+
+
+Type<\\>Key<\\>COL1<\\>COL2<\\>COL3<\\>COL4<\\>COL5<\\>COL6<\\>COL7<\\>COL8<\\>COL9<\\>COL10<\\>COL11<\\>COL12
+TYPE<\\>HTML<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+INPUT-FILE<\\>last_hrs_lot_scan_temp.csv<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+OUTPUT-FILE<\\>SQLPathFinder.htm<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+CSS<\\>sqlpathfinder_style_1.css<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+COLSPAN<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+DRILLDOWN<\\>N<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+DYNAMICSORT<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+DYNAMICFILTER<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+ATTOPDRILLDOWN<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+NOPREPROCESS<\\>Y<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+COLUMN-DATA<\\><\\>facility<\\>fac_lot<\\>lot<\\>operation<\\>prod<\\>devrevstep<\\>program_or_recipe<\\>total_tested<\\>test_end_date<\\>load_end_date<\\>current_ts<\\>
+COLUMN-HEADERS<\\><\\>Facility<\\>Fac Lot<\\>Lot<\\>Operation<\\>Prod<\\>Devrevstep<\\>Program Or Recipe<\\>Total Tested<\\>Test End Date<\\>Load End Date<\\>Current Ts<\\>
+COLUMN-ALIGNMENT<\\><\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>middle-left<\\>
+COLUMN-FORMAT<\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\><\\>
+<---- New Query ---->
+<OPTIONS>
+/REPORT=HTML-LAYOUT
+/OUTLOOK=Y
+/INSTANCE=6285
+/JSON-ONLY=N
+/CHART-INSTANCE=13726
+/APP_SERVER_DEFAULT=atd_atm.hadoop
+</OPTIONS>
+<table class="tblout"><tr class="tblout"><td class="tblout" valign="top">
+:FILE:EMAIL:self
+:CSS:sqlpathfinder_style_1.css
+:CSSEMBED:N
+:RR:NO
+:B:N
+:EM-A:rawdata.csv
+:EM-S:
+:SEC:Y
+:TITLE:Scripting_Alert_Vmin_result_not_analyzed_A01
+<table class="tblout">
+<tr class="tblout">
+<td class="tblout">
+HTM:MYREPORT2
+</td>
+</tr>
+<tr class="tblout">
+<td class="tblout">
+<p style="text-align: left" style="background-color: white"><font face="Verdana" size="4" color="black">Please root cause it if consistantly see similar error reported.<br><br>Note: this error means scripts can not handle it well to provide Vmin computation result to conclude Vmin distribution assessment.<br>Known cause for this error: 1. script hosted w/ small memory size job. 2. raw data not complete to conduct Vmin result check.<br></font>
+</td>
+</tr>
+</table>
+</td><td class="tblout" valign="top">
+<table class="tblout">
+<tr class="tblout"><td class="tblout"></td></tr>
+</table>
+</td></tr></table>
+<---- New Query ---->
+<OPTIONS>
+/REPORT=HTML-DELETE
+/INSTANCE=6285
+</OPTIONS>
+N/A
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={END-IF}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={END-LOOP}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={END-IF}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={END-MACRO}
+</OPTIONS>
+
+
+
+<---- New Query ---->
+
+<OPTIONS>
+/WORKDIR=.\
+/INSTANCE=6285
+/OUTLOOK=Y
+/UTILITIES={END-LOOP}
+</OPTIONS>
+
+

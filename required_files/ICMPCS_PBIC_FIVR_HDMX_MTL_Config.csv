@@ -1,0 +1,5 @@
+Email_title,hr_interval,min_lot_size,OPERATION,TestName,Domain,delta,x_iqr,ss_target,ss_rest,TP1,adj_ss_target,platform
+HDMX_DLVR Check per Socket Result_MTLP2,4,200,"6248','6249','7820','7827",%SLP123_OFF_R2_RESULT%,,5,1.2,5,300,MTLPAX7%,10,client
+HDMX_DLVR Check per Socket Result_MTLH6,4,200,"6248','6249','7820','7827",%SLP123_OFF_R2_RESULT%,,5,1.2,5,300,MTLPCX7%,10,client
+HDMX_DLVR Check per Socket Result_MTLM2,4,200,"6248','6249','7820','7827",%SLP123_OFF_R2_RESULT%,,5,1.2,5,300,MTLMAX3%,10,client
+HDMX_DLVR Check per Socket Result_MTLPS6,4,200,"6248','6249','7820','7827",%SLP123_OFF_R2_RESULT%,,5,1.2,5,300,MTLPCZ6%,10,client
