@@ -7,6 +7,21 @@ import datetime
 import logging
 import error_handling
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 logging.basicConfig(filename='log_file.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("==================================================")
 logging.info('Process 6: Plot the Scatter Plot with limit line')
