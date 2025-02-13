@@ -5,8 +5,15 @@ import logging
 import time
 import error_handling
 import pandas as pd
+import sys
+import subprocess
 
-logging.basicConfig(filename='log_file.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+script_dir = os.path.dirname(__file__)
+log_path = os.path.join(script_dir,'log_file.log')
+data_folder_path_storage = os.path.join(script_dir,'data_folder_path.txt')
+next_script_path = os.path.join(script_dir,'01_retrieve.py')
+
+logging.basicConfig(filename=log_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("===========================================")
 logging.info('Process 10: Move Processed Files to Storage')
 logging.info("===========================================")
@@ -17,7 +24,7 @@ print("============================================")
 
 try: 
     ori_path = r"\\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\dummy_site\dummy_group\HIST"
-    with open('data_folder_path.txt', 'r') as file:
+    with open(data_folder_path_storage, 'r') as file:
         data_folder_path = file.read().strip()
 
     # Rename rawdata files
@@ -60,7 +67,7 @@ try:
         move_file_with_retry(file_path, new_path)
 
     # Clear copied vmin folder in local env
-    folder_path = os.path.join(os.path.dirname(__file__), "VminFilesPlot")
+    folder_path = os.path.join(script_dir, "VminFilesPlot")
     if os.path.exists(folder_path) and os.path.isdir(folder_path):
         try:
             # Delete the folder and all its contents
@@ -75,7 +82,7 @@ try:
         logging.info(f"The folder '{folder_path}' does not exist or is not a directory.")
 
     #Move boxplot images to storage
-    boxplot_path = os.path.dirname(__file__)
+    boxplot_path = script_dir
     boxplot_files = glob.glob(os.path.join(boxplot_path,"vmin_distribution_*"))
     print(f"Moving boxplot files...")
     for boxplot_file in boxplot_files:
@@ -93,8 +100,8 @@ try:
     logging.info('-------------------------------------------------------------------')
 
     # Call back first process
-    next_script_path = './01_retrieve.py'
-    os.system(f'python {next_script_path}')
+    python_executable = sys.executable
+    subprocess.run([python_executable, next_script_path])
 
 except Exception as e:
     error_handling.handle_exception(e)

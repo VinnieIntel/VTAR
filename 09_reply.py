@@ -3,9 +3,17 @@ import os
 import pandas as pd
 import logging
 import error_handling
+import sys
+import subprocess
 
+script_dir = os.path.dirname(__file__)
+log_path = os.path.join(script_dir,'log_file.log')
+lot_list_path = os.path.join(script_dir,'lot_list_processed.csv')
+email_id_path = os.path.join(script_dir,'email_entry_id.txt')
+lot_csv_path = os.path.join(script_dir,'output.csv')
+next_script_path = os.path.join(script_dir,'10_moveFiles.py')
 
-logging.basicConfig(filename='log_file.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename=log_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("=======================================")
 logging.info('Process 9: Send Respond Email Back...')
 logging.info("=======================================")
@@ -15,11 +23,10 @@ print(f"Process 9: Send Respond Email Back...")
 print("============================================")
 
 try:
-    image_dir = os.path.dirname(__file__)
+    image_dir = script_dir
     image_files = sorted(os.listdir(image_dir))
 
     # Get lot list
-    lot_list_path = 'lot_list_processed.csv'
     lot_list_df = pd.read_csv(lot_list_path)
     lot_list = lot_list_df['CLS_LOT'].tolist()
     print(f"Lot List : {lot_list}")
@@ -36,7 +43,7 @@ try:
     print(f'Containment From :{firstContLot} to {lastContLot} (+ any lot in progress)')
     logging.info(f'Containment From :{firstContLot} to {lastContLot} (+ any lot in progress)')
 
-    with open('email_entry_id.txt', 'r') as file:
+    with open(email_id_path, 'r') as file:
         email_entry_id = file.read().strip()
     outlook = client.Dispatch("Outlook.Application").GetNamespace("MAPI")
     mail_item = outlook.GetItemFromID(email_entry_id)
@@ -44,7 +51,6 @@ try:
     reply = mail_item.ReplyAll()  
     reply.To = "vinnie.wen.ying.tiang@intel.com"
 
-    lot_csv_path = 'output.csv'
     df_csv = pd.read_csv(lot_csv_path)
     lot_number = df_csv['Lot Number'].iloc[0]
     first_html_body = f"<html><body><b>Triggering Lot {lot_number}. This is a reply email with embedded scatterplot and boxplot images.</b><br><br></body>"
@@ -138,8 +144,8 @@ try:
     logging.info("Email sent with embedded scatterplot images.")
 
     # Call next process
-    next_script_path = './10_moveFiles.py'
-    os.system(f'python {next_script_path}')
+    python_executable = sys.executable
+    subprocess.run([python_executable, next_script_path])
 
 except Exception as e:
     error_handling.handle_exception(e)

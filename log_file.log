@@ -22221,3 +22221,188 @@ OSError: [WinError 123] The filename, directory name, or volume label syntax is 
   File "<frozen os>", line 225, in makedirs
 OSError: [WinError 123] The filename, directory name, or volume label syntax is incorrect: 'd$\\localhost:'
 
+2025-02-13 11:37:07,429 - INFO - ============================================
+2025-02-13 11:37:07,430 - INFO - Process 1: Retrieve information from email
+2025-02-13 11:37:07,430 - INFO - ============================================
+2025-02-13 11:37:07,431 - INFO - Deleting previous files ...
+2025-02-13 11:37:07,432 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M433F455.png
+2025-02-13 11:37:07,433 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M433G656.png
+2025-02-13 11:37:07,433 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M433G758.png
+2025-02-13 11:37:07,434 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M434G570.png
+2025-02-13 11:37:07,434 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M434G797.png
+2025-02-13 11:37:07,434 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M434G972.png
+2025-02-13 11:37:07,435 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M434H013.png
+2025-02-13 11:37:07,435 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M434H091.png
+2025-02-13 11:37:07,436 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M434H155.png
+2025-02-13 11:37:07,437 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M435F187.png
+2025-02-13 11:37:07,437 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M435F306.png
+2025-02-13 11:37:07,438 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M435F358.png
+2025-02-13 11:37:07,438 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M435F492.png
+2025-02-13 11:37:07,439 - INFO - Deleted file: C:\VinnieProjects\VTAR\lot_list_processed.csv
+2025-02-13 11:37:52,475 - INFO - *************************************************************
+2025-02-13 11:37:52,475 - INFO - Email found (The Latest Trigger Email):
+2025-02-13 11:37:52,475 - INFO - Subject: HDMX_Vmin Check per Socket Result_ICDHCC;ICDLCC_A01
+2025-02-13 11:37:52,476 - INFO - Sender: Muniandy, Yasothye
+2025-02-13 11:37:52,476 - INFO - Received: 2024-11-17 17:21:49.667000+00:00
+2025-02-13 11:37:52,484 - INFO - Warning: 'Lot' column index (12) is out of range for the row.
+2025-02-13 11:37:52,485 - INFO - Warning: 'Unit Tester Id' column index (23) is out of range for the row.
+2025-02-13 11:37:52,487 - INFO - Lot number: M445G291
+2025-02-13 11:37:52,487 - INFO - Domain Frequency Core 1: Vmin@NCPM@0.400@
+2025-02-13 11:37:52,487 - INFO - Tool Name : HXV006
+2025-02-13 11:37:52,487 - INFO - Cell Name : C401
+2025-02-13 11:37:52,487 - INFO - Unit Tester Id: P HXT T60953
+2025-02-13 11:37:52,492 - INFO - Output saved to 'C:\VinnieProjects\VTAR\output.csv'
+2025-02-13 11:37:53,173 - INFO - \\KMATSHFS.intel.com\KMATAnalysis$\MAOATM\PG\Personal\vtiang\M445G291
+2025-02-13 11:37:53,669 - INFO - ===============================================
+2025-02-13 11:37:53,669 - INFO - Process 2: Get the lot list from ARIES database
+2025-02-13 11:37:53,669 - INFO - ===============================================
+2025-02-13 11:37:55,562 - INFO - Output saved to 'C:\VinnieProjects\VTAR\full_lot_list.csv'
+2025-02-13 11:37:55,572 - INFO - 
+      CLS_LOT  ... DEVICE_TESTER_ID
+112  M445G291  ...     P HXT T60953
+
+[1 rows x 9 columns]
+
+2025-02-13 11:37:55,573 - INFO - Processed output saved to 'C:\VinnieProjects\VTAR\lot_list_processed.csv'
+2025-02-13 11:37:56,054 - INFO - ====================================================
+2025-02-13 11:37:56,054 - INFO - Process 3: SQLPathFinder Python API to Get 3 Files
+2025-02-13 11:37:56,054 - INFO - ====================================================
+2025-02-13 11:37:56,057 - INFO - *********************
+2025-02-13 11:37:56,057 - INFO - * The lot: M445G291 *
+2025-02-13 11:37:56,057 - INFO - *********************
+2025-02-13 11:37:56,057 - INFO - Verifying whether your local SQLPFSvcClient API is up to date
+2025-02-13 11:38:01,541 - INFO - Preparing Required files in atdfile environment...
+2025-02-13 11:38:05,905 - INFO - Copied ICMPCS_PBICVmin_HDMX_cfg_dummy.csv to \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\ICMPCS_PBICVmin_HDMX_cfg_dummy.csv
+2025-02-13 11:38:09,852 - INFO - Copied ICMPCS_PBIC_FIVR_HDMX_Client_config.csv to \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\ICMPCS_PBIC_FIVR_HDMX_Client_config.csv
+2025-02-13 11:38:13,595 - INFO - Copied ICMPCS_PBIC_FIVR_HDMX_MTL_Config.csv to \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\ICMPCS_PBIC_FIVR_HDMX_MTL_Config.csv
+2025-02-13 11:38:17,769 - INFO - Copied ICMPCS_PBIC_FIVR_HDMX_Server_config.csv to \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\ICMPCS_PBIC_FIVR_HDMX_Server_config.csv
+2025-02-13 11:38:23,048 - INFO - Copied ICMPCS_Vmin_CSR_HDMX_1.exe to \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\ICMPCS_Vmin_CSR_HDMX_1.exe
+2025-02-13 11:38:23,048 - INFO - Required files are ready in \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy...
+2025-02-13 11:38:23,450 - INFO - Starting retrieval of the 3 vmin files from SQLPF
+2025-02-13 11:45:23,765 - INFO - ====================================
+2025-02-13 11:45:23,765 - INFO - Process 4: Get the limit for the TP
+2025-02-13 11:45:23,765 - INFO - ====================================
+2025-02-13 11:45:23,768 - INFO - Lot Number: M445G291
+2025-02-13 11:45:23,768 - INFO - Program Name: ICDSVXXC0H40F00S426
+2025-02-13 11:45:23,771 - INFO - X_iqr: [1.3]
+2025-02-13 11:45:23,771 - INFO - p25_delta: [0.028]
+2025-02-13 11:45:23,773 - INFO - Output saved to 'C:\VinnieProjects\VTAR\limit_value.csv'
+2025-02-13 11:45:24,286 - INFO - ===================================================
+2025-02-13 11:45:24,286 - INFO - Process 5: Check the Transaction Status of the lot
+2025-02-13 11:45:24,286 - INFO - ===================================================
+2025-02-13 11:45:25,063 - INFO - Status of M445G291 saved to 'lot_transaction.csv'
+2025-02-13 11:45:25,065 - INFO - Contents of lot_transaction.csv:
+     LOT OPERATION TRANSACTION
+M445G291      6262        MVIN
+M445G291      6262        MVOU
+2025-02-13 11:45:25,811 - INFO - ==================================================
+2025-02-13 11:45:25,811 - INFO - Process 6: Plot the Scatter Plot with limit line
+2025-02-13 11:45:25,811 - INFO - ==================================================
+2025-02-13 11:45:25,814 - INFO - Vmin values : ['Vmin@NCPM@0.400@']
+2025-02-13 11:45:25,814 - INFO - Vmin prefixes : {'Vmin@NCPM@0.400'}
+2025-02-13 11:45:25,815 - INFO - Device Tester ID: P HXT T60953
+2025-02-13 11:45:25,816 - INFO - Limit for X_iqr: 1.3
+2025-02-13 11:45:25,816 - INFO - Limit for delta_p25: 0.028
+2025-02-13 11:45:28,548 - INFO - A01_M445G291
+2025-02-13 11:45:28,548 - INFO - (138, 20)
+2025-02-13 11:45:28,548 - INFO - (1242, 20)
+2025-02-13 11:45:35,137 - INFO - Lot Number processing: M445G291
+2025-02-13 11:45:35,141 - INFO - Dataset for A01_M445G291 is downshift.
+2025-02-13 11:45:35,663 - INFO - ========================================================================
+2025-02-13 11:45:35,663 - INFO - Process 2A: Update Processed Lot List & New Lot Number to be process (-)
+2025-02-13 11:45:35,663 - INFO - ========================================================================
+2025-02-13 11:45:35,668 - INFO - Processed: M445G291
+2025-02-13 11:45:35,670 - INFO - The next line before LOT M445G291 has been saved to C:\VinnieProjects\VTAR\the_lot.csv.
+2025-02-13 11:45:35,674 - INFO - To process next: M445F052 (N-1)
+2025-02-13 11:45:35,675 - INFO - The new line for LOT M445F052 with sequence N-1 has been appended to C:\VinnieProjects\VTAR\lot_list_processed.csv.
+2025-02-13 11:45:36,166 - INFO - ====================================================
+2025-02-13 11:45:36,166 - INFO - Process 3: SQLPathFinder Python API to Get 3 Files
+2025-02-13 11:45:36,166 - INFO - ====================================================
+2025-02-13 11:45:36,171 - INFO - *********************
+2025-02-13 11:45:36,171 - INFO - * The lot: M445F052 *
+2025-02-13 11:45:36,172 - INFO - *********************
+2025-02-13 11:45:36,172 - INFO - Verifying whether your local SQLPFSvcClient API is up to date
+2025-02-13 11:45:39,972 - INFO - Preparing Required files in atdfile environment...
+2025-02-13 11:45:44,136 - INFO - Copied ICMPCS_PBICVmin_HDMX_cfg_dummy.csv to \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\ICMPCS_PBICVmin_HDMX_cfg_dummy.csv
+2025-02-13 11:45:45,078 - INFO - Process interrupted by user.
+2025-02-13 17:36:13,460 - INFO - ============================================
+2025-02-13 17:36:13,460 - INFO - Process 1: Retrieve information from email
+2025-02-13 17:36:13,460 - INFO - ============================================
+2025-02-13 17:36:13,461 - INFO - Deleting previous files ...
+2025-02-13 17:36:13,461 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_A01_M445G291.png
+2025-02-13 17:36:13,461 - INFO - Deleted file: C:\VinnieProjects\VTAR\Scatterplot_centroid_A01_M445G291.png
+2025-02-13 17:36:13,462 - INFO - Deleted file: C:\VinnieProjects\VTAR\lot_list_processed.csv
+2025-02-13 17:36:43,919 - ERROR - An error occurred: (-2146959355, 'Server execution failed', None, None)
+2025-02-13 17:40:03,012 - INFO - ============================================
+2025-02-13 17:40:03,012 - INFO - Process 1: Retrieve information from email
+2025-02-13 17:40:03,012 - INFO - ============================================
+2025-02-13 17:40:03,013 - INFO - Deleting previous files ...
+2025-02-13 17:40:45,759 - INFO - *************************************************************
+2025-02-13 17:40:45,759 - INFO - Email found (The Latest Trigger Email):
+2025-02-13 17:40:45,759 - INFO - Subject: HDMX_Vmin Check per Socket Result_ICDHCC;ICDLCC_A01
+2025-02-13 17:40:45,760 - INFO - Sender: Muniandy, Yasothye
+2025-02-13 17:40:45,760 - INFO - Received: 2024-11-17 17:21:49.667000+00:00
+2025-02-13 17:40:45,768 - INFO - Warning: 'Lot' column index (12) is out of range for the row.
+2025-02-13 17:40:45,768 - INFO - Warning: 'Unit Tester Id' column index (23) is out of range for the row.
+2025-02-13 17:40:45,770 - INFO - Lot number: M445G291
+2025-02-13 17:40:45,770 - INFO - Domain Frequency Core 1: Vmin@NCPM@0.400@
+2025-02-13 17:40:45,770 - INFO - Tool Name : HXV006
+2025-02-13 17:40:45,770 - INFO - Cell Name : C401
+2025-02-13 17:40:45,770 - INFO - Unit Tester Id: P HXT T60953
+2025-02-13 17:40:45,775 - INFO - Output saved to 'C:\VinnieProjects\VTAR\output.csv'
+2025-02-13 17:40:46,583 - INFO - \\KMATSHFS.intel.com\KMATAnalysis$\MAOATM\PG\Personal\vtiang\M445G291
+2025-02-13 17:40:47,021 - INFO - ===============================================
+2025-02-13 17:40:47,021 - INFO - Process 2: Get the lot list from ARIES database
+2025-02-13 17:40:47,021 - INFO - ===============================================
+2025-02-13 17:40:48,295 - INFO - Output saved to 'C:\VinnieProjects\VTAR\full_lot_list.csv'
+2025-02-13 17:40:48,304 - INFO - 
+      CLS_LOT LOT_SEQUENCE  ... TIU_PERSONALITY_CARD_ID DEVICE_TESTER_ID
+112  M445G291            N  ...           ICDLCC11T4019     P HXT T60953
+
+[1 rows x 9 columns]
+
+2025-02-13 17:40:48,304 - INFO - Processed output saved to 'C:\VinnieProjects\VTAR\lot_list_processed.csv'
+2025-02-13 17:40:48,735 - INFO - ====================================================
+2025-02-13 17:40:48,735 - INFO - Process 3: SQLPathFinder Python API to Get 3 Files
+2025-02-13 17:40:48,735 - INFO - ====================================================
+2025-02-13 17:40:48,737 - INFO - *********************
+2025-02-13 17:40:48,737 - INFO - * The lot: M445G291 *
+2025-02-13 17:40:48,737 - INFO - *********************
+2025-02-13 17:40:48,737 - INFO - Verifying whether your local SQLPFSvcClient API is up to date
+2025-02-13 17:40:55,869 - INFO - Preparing Required files in atdfile environment...
+2025-02-13 17:41:00,252 - INFO - Copied ICMPCS_PBICVmin_HDMX_cfg_dummy.csv to \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\ICMPCS_PBICVmin_HDMX_cfg_dummy.csv
+2025-02-13 17:41:04,204 - INFO - Copied ICMPCS_PBIC_FIVR_HDMX_Client_config.csv to \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\ICMPCS_PBIC_FIVR_HDMX_Client_config.csv
+2025-02-13 17:41:07,957 - INFO - Copied ICMPCS_PBIC_FIVR_HDMX_MTL_Config.csv to \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\ICMPCS_PBIC_FIVR_HDMX_MTL_Config.csv
+2025-02-13 17:41:12,141 - INFO - Copied ICMPCS_PBIC_FIVR_HDMX_Server_config.csv to \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\ICMPCS_PBIC_FIVR_HDMX_Server_config.csv
+2025-02-13 17:41:17,409 - INFO - Copied ICMPCS_Vmin_CSR_HDMX_1.exe to \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy\ICMPCS_Vmin_CSR_HDMX_1.exe
+2025-02-13 17:41:17,409 - INFO - Required files are ready in \\atdfile3.ch.intel.com\catts\export\csv\vtiang\Vmin_dummy...
+2025-02-13 17:41:17,736 - INFO - Starting retrieval of the 3 vmin files from SQLPF
+2025-02-13 17:48:23,947 - INFO - ====================================
+2025-02-13 17:48:23,947 - INFO - Process 4: Get the limit for the TP
+2025-02-13 17:48:23,947 - INFO - ====================================
+2025-02-13 17:48:23,949 - INFO - Lot Number: M445G291
+2025-02-13 17:48:23,949 - INFO - Program Name: ICDSVXXC0H40F00S426
+2025-02-13 17:48:23,951 - INFO - X_iqr: [1.3]
+2025-02-13 17:48:23,951 - INFO - p25_delta: [0.028]
+2025-02-13 17:48:23,953 - INFO - Output saved to 'C:\VinnieProjects\VTAR\limit_value.csv'
+2025-02-13 17:48:24,377 - INFO - ===================================================
+2025-02-13 17:48:24,377 - INFO - Process 5: Check the Transaction Status of the lot
+2025-02-13 17:48:24,377 - INFO - ===================================================
+2025-02-13 17:48:24,871 - INFO - Status of M445G291 saved to 'C:\VinnieProjects\VTAR\lot_transaction.csv'
+2025-02-13 17:48:24,872 - INFO - Contents of C:\VinnieProjects\VTAR\lot_transaction.csv:
+     LOT OPERATION TRANSACTION
+M445G291      6262        MVIN
+M445G291      6262        MVOU
+2025-02-13 17:48:25,523 - INFO - ==================================================
+2025-02-13 17:48:25,523 - INFO - Process 6: Plot the Scatter Plot with limit line
+2025-02-13 17:48:25,523 - INFO - ==================================================
+2025-02-13 17:48:25,525 - INFO - Vmin values : ['Vmin@NCPM@0.400@']
+2025-02-13 17:48:25,525 - INFO - Vmin prefixes : {'Vmin@NCPM@0.400'}
+2025-02-13 17:48:25,526 - INFO - Device Tester ID: P HXT T60953
+2025-02-13 17:48:25,527 - INFO - Limit for X_iqr: 1.3
+2025-02-13 17:48:25,527 - INFO - Limit for delta_p25: 0.028
+2025-02-13 17:48:28,332 - INFO - A01_M445G291
+2025-02-13 17:48:28,332 - INFO - (138, 20)
+2025-02-13 17:48:28,332 - INFO - (1242, 20)
+2025-02-13 17:48:34,736 - INFO - Lot Number processing: M445G291
+2025-02-13 17:48:34,743 - INFO - Dataset for A01_M445G291 is downshift.

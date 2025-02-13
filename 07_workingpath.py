@@ -5,8 +5,15 @@ import logging
 import traceback
 import error_handling
 import pandas as pd
+import sys
+import subprocess
 
-logging.basicConfig(filename='log_file.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+script_dir = os.path.dirname(__file__)
+log_path = os.path.join(script_dir,'log_file.log')
+data_folder_path_storage = os.path.join(script_dir,'data_folder_path.txt')
+next_script_path = os.path.join(script_dir,'plotting.py')
+
+logging.basicConfig(filename=log_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("=================================================")
 logging.info('Process 7: Move Vmin Files to Local Environment')
 logging.info("=================================================")
@@ -76,7 +83,7 @@ try:
     logging.info(f"Move Backup Scatterplots to Storage")
     logging.info("=======================================")
 
-    with open('data_folder_path.txt', 'r') as file:
+    with open(data_folder_path_storage, 'r') as file:
         data_folder_path = file.read().strip()
     
     scatterplot_files = glob.glob(os.path.join(os.path.dirname(__file__),"Scatterplot_centroid_*"))
@@ -101,8 +108,8 @@ try:
     
 
     # Call next process
-    next_script_path = './08_plotting.py'
-    os.system(f'python {next_script_path}')
+    python_executable = sys.executable
+    subprocess.run([python_executable, next_script_path])
 
 except Exception as e:
     error_handling.handle_exception(e)
