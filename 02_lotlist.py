@@ -5,10 +5,22 @@ import os
 import datetime
 import logging
 import error_handling
+import sys
+import subprocess
 
 warnings.filterwarnings("ignore")
 
-logging.basicConfig(filename='log_file.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Set file location
+script_dir = os.path.dirname(__file__)
+log_path = os.path.join(script_dir,'log_file.log')
+lot_csv_path = os.path.join(script_dir, 'output.csv')
+processed_lot_list_path = os.path.join(script_dir,'lot_list_processed.csv')
+next_script_path = os.path.join(script_dir,'03_SQLPF.py')
+the_lot_path = os.path.join(script_dir,"the_lot.csv")
+full_lot_list_path = os.path.join(script_dir,'full_lot_list.csv')
+
+
+logging.basicConfig(filename=log_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("===============================================")
 logging.info('Process 2: Get the lot list from ARIES database')
 logging.info("===============================================")
@@ -18,7 +30,6 @@ print(f"Process 2: Get the lot list from ARIES database")
 print("=================================================")
 
 try: 
-    lot_csv_path = 'output.csv'
     df_csv = pd.read_csv(lot_csv_path)
     lot_number = df_csv['Lot Number'].iloc[0]
     tool_id = df_csv['Tool Names'].iloc[0]
@@ -62,10 +73,8 @@ try:
 
     the_lot_index = df_aries[df_aries['LOT'] ==lot_number].index[0]
     df_aries_the_lot = df_aries.iloc[[the_lot_index]]
-    the_lot_path = "the_lot.csv"
     df_aries_the_lot.to_csv(the_lot_path, index=False)
 
-    full_lot_list_path = 'full_lot_list.csv'
     df_aries.to_csv(full_lot_list_path, index=False)
     print(f"Output saved to '{full_lot_list_path}'") 
     logging.info(f"Output saved to '{full_lot_list_path}'") 
@@ -99,7 +108,6 @@ try:
     processed_df = processed_df.rename(columns=column_mapping)
 
     # save to csv
-    processed_lot_list_path = 'lot_list_processed.csv'
     processed_df.to_csv(processed_lot_list_path, index=False)
     print(f"\n{processed_df}\n")
     logging.info(f"\n{processed_df}\n")
@@ -107,8 +115,8 @@ try:
     logging.info(f"Processed output saved to '{processed_lot_list_path}'")
 
     # Call next process
-    next_script_path = './03_SQLPF.py'
-    os.system(f'python {next_script_path}')
+    python_executable = sys.executable
+    subprocess.run([python_executable, next_script_path])
 
 except Exception as e:
     error_handling.handle_exception(e)
