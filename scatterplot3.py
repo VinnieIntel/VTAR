@@ -1,12 +1,11 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import shutil
 import glob
 import os
-import shutil
+import datetime 
 import logging
 import error_handling
-import numpy as np
-
 
 logging.basicConfig(filename='log_file.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("==================================================")
@@ -56,7 +55,7 @@ try:
         lot_number = fac_lot_number.split('_')[-1]
 
         filtered_df = df[df['hw_type'] == "unit_tester_id"]
-        filtered_df = filtered_df[filtered_df['x_iqr'] != 999]
+        # filtered_df = filtered_df[filtered_df['domain_frequency_core'].apply(lambda x: any(x.startswith(prefix) for prefix in vmin_prefixes))]  #filter vmin token
         filtered_df_with_hw = filtered_df[filtered_df['hw_name'] == hw_name]
         filtered_df_other_hw = filtered_df[filtered_df['hw_name'] != hw_name]
         print (f'\n{fac_lot_number}')
@@ -90,45 +89,6 @@ try:
         vmin_file = new_vmin_file_path  # Update the vmin_file variable to the new file name
 
 
-        ### Handle Downshift but within limit ###
-        filtered_df = filtered_df[filtered_df['domain_frequency_core'].apply(lambda x: any(x.startswith(prefix) for prefix in vmin_prefixes))]  #filter vmin token
-        filtered_df_with_hw_centroid = filtered_df[filtered_df['hw_name'] == hw_name]
-        filtered_df_other_hw_centroid = filtered_df[filtered_df['hw_name'] != hw_name]
-        with_hw_centroid = filtered_df_with_hw_centroid[['delta_p25', 'x_iqr']].mean().to_numpy()
-        other_hw_centroid = filtered_df_other_hw_centroid[['delta_p25', 'x_iqr']].mean().to_numpy()
-        plt.scatter(filtered_df_other_hw_centroid['delta_p25'], filtered_df_other_hw_centroid['x_iqr'], alpha=0.5)
-        plt.scatter(filtered_df_with_hw_centroid['delta_p25'], filtered_df_with_hw_centroid['x_iqr'], color='red', alpha=0.5)
-        plt.axhline(y=-x_iqr_limit, color='red', linestyle='--', label=f'X_iqr limit (-{x_iqr_limit})')  
-        plt.axvline(x=-delta_p25_limit, color='red', linestyle='--', label=f'Delta_p25 limit (-{delta_p25_limit})')  
-        plt.scatter(*with_hw_centroid, color='black', marker='x', s=100, label='With HW Centroid')
-        plt.scatter(*other_hw_centroid, color='blue', marker='x', s=100, label='Other HW Centroid')
-        print(f"Centroid of with_hw data: {with_hw_centroid}")
-        print(f"Centroid of other_hw data: {other_hw_centroid}")
-        # Step 2: Calculate the Euclidean distance between centroids
-        vector_diff = with_hw_centroid - other_hw_centroid
-        distance = np.linalg.norm(vector_diff)
-        print(f"Distance between centroids: {distance}")
-        plt.title(f'Bivariate Fit of x_iqr By delta_p25 fac_lot = {fac_lot_number}')
-        plt.xlabel('delta_p25')
-        plt.ylabel('x_iqr')
-        plt.legend()
-        plt.tight_layout() 
-        plot_centroid_filename = f'Scatterplot_centroid_{fac_lot_number}.png'
-        plt.savefig(plot_centroid_filename)
-        plt.close()
-
-        distance_threshold = 0.5  # Adjust here if needed
-        if distance > distance_threshold:
-            # Check if `with_hw_centroid` is strictly lower in both axes
-            if vector_diff[0] < 0 and vector_diff[1] < 0:
-                is_downshift_within_limit = True
-                print(f"Downshift detected: Distance ({distance}) exceeds threshold ({distance_threshold}).")
-            else:
-                is_downshift_within_limit = False
-                print("The shift is an upshift, not considered a downshift.")
-        else:
-            is_downshift_within_limit = False
-            print(f"No downshift detected: Distance ({distance}) is within threshold ({distance_threshold}).")
     else:
         print("No vmin result files found!! Something is wrong...")
         logging.info("No vmin result files found!! Something is wrong...")
@@ -139,14 +99,8 @@ try:
         (filtered_df_with_hw['x_iqr'] < -x_iqr_limit)
     ).any()
 
-    print(f"downshift status: {is_downshift}")
 
-    if is_downshift:
-        print(f"This lot is downshift by exceeding the limit.")
-    else:
-        print(f"This lot has not been detected to have datapoints exceeding the limit.")
-
-    # # Move vmin file processed
+    # Move vmin file processed
     with open('data_folder_path.txt','r') as file :
         data_folder_path = file.read().strip()
 
@@ -157,14 +111,12 @@ try:
     new_path = os.path.join(data_folder_path, filename)
     shutil.move(vmin_file, new_path)
 
+
+
     lot_list_path = 'lot_list_processed.csv'
     df_lot_list = pd.read_csv(lot_list_path)
     print(f'Lot Number processing: {lot_number}')
     logging.info(f'Lot Number processing: {lot_number}')
-
-    matching_row_index = df_lot_list.index[df_lot_list['CLS_LOT'] == lot_number].tolist()
-    matching_row = df_lot_list[df_lot_list['CLS_LOT'] == lot_number]
-    lot_sequence = matching_row['LOT_SEQUENCE'].iloc[0]
     
     #handle "in progress" lot
     lot_transaction_path = 'lot_transaction.csv'
@@ -173,6 +125,9 @@ try:
     if 'MVOU' not in df_transaction['TRANSACTION'].values:
         print(f"MVOU not found in TRANSACTION column. {lot_number} is in progress.")
         logging.info(f"MVOU not found in TRANSACTION column. {lot_number} is in progress.")
+        matching_row_index = df_lot_list.index[df_lot_list['CLS_LOT'] == lot_number].tolist()
+        matching_row = df_lot_list[df_lot_list['CLS_LOT'] == lot_number]
+        lot_sequence = matching_row['LOT_SEQUENCE'].iloc[0]
         df_lot_list.loc[matching_row_index[0], 'STATUS'] = 'in progress'
         new_column_order = [
         'CLS_LOT', 'LOT_SEQUENCE', 'STATUS', 'CLS_OPERATION', 'CLS_TESTER_ID', 'CLS_THERMAL_HEAD', 
@@ -185,12 +140,7 @@ try:
     else: 
         print(f"MVOU is found in TRANSACTION column. {lot_number} is completed.")
         if len(df_lot_list) == 1: # if the_lot current is N (first lot under process)
-            if is_downshift:
-                df_lot_list.loc[matching_row_index[0], 'STATUS'] = 'downshift'
-            elif is_downshift_within_limit:
-                df_lot_list.loc[matching_row_index[0], 'STATUS'] = 'downshift but within limit' # Most probably wont reach this line :)
-            else:
-                df_lot_list.loc[matching_row_index[0], 'STATUS'] = 'clean'
+            df_lot_list['STATUS'] = 'downshift' if is_downshift else 'clean'
             new_column_order = [
             'CLS_LOT', 'LOT_SEQUENCE', 'STATUS', 'CLS_OPERATION', 'CLS_TESTER_ID', 'CLS_THERMAL_HEAD', 
             'DEVICE_END_DATE_TIME', 'SITE_ID', 'TIU_PERSONALITY_CARD_ID', 'DEVICE_TESTER_ID'
@@ -202,11 +152,7 @@ try:
                 print(f"Dataset for {fac_lot_number} is downshift.")
                 logging.info(f"Dataset for {fac_lot_number} is downshift.")
                 next_script_path = './02A_thelot_before.py'
-            elif is_downshift_within_limit: # Most probably wont reach this line :)
-                print(f"Dataset for {fac_lot_number} is downshift but within limit.")
-                logging.info(f"Dataset for {fac_lot_number} is downshift but within limit.")
-                next_script_path = './02A_thelot_before.py'
-            else:    
+            else:   
                 print(f"Dataset for {fac_lot_number} is clean.")
                 logging.info(f"Dataset for {fac_lot_number} is clean.")
                 next_script_path = './02B_thelot_after.py'
@@ -218,13 +164,7 @@ try:
             matching_row = df_lot_list[df_lot_list['CLS_LOT'] == lot_number]
             lot_sequence = matching_row['LOT_SEQUENCE'].iloc[0]
 
-            if is_downshift:
-                df_lot_list.loc[matching_row_index[0], 'STATUS'] = 'downshift'
-            elif is_downshift_within_limit:
-                df_lot_list.loc[matching_row_index[0], 'STATUS'] = 'downshift but within limit'
-            else:
-                df_lot_list.loc[matching_row_index[0], 'STATUS'] = 'clean'
-                    
+            df_lot_list.loc[matching_row_index[0], 'STATUS'] = 'downshift' if is_downshift else 'clean'
             new_column_order = [
             'CLS_LOT', 'LOT_SEQUENCE', 'STATUS', 'CLS_OPERATION', 'CLS_TESTER_ID', 'CLS_THERMAL_HEAD', 
             'DEVICE_END_DATE_TIME', 'SITE_ID', 'TIU_PERSONALITY_CARD_ID', 'DEVICE_TESTER_ID'
@@ -233,14 +173,15 @@ try:
             rearranged_lot_list_df.to_csv(lot_list_path, index=False)
 
             if not matching_row.empty: # for debug error
-                if is_downshift | is_downshift_within_limit:
+                if is_downshift:
+                
                     if 'N-' in lot_sequence:
                         print(f"Dataset for {lot_number} is downshift, and in the past sequence.")
                         logging.info(f"Dataset for {lot_number} is downshift, and in the past sequence.")
                         next_script_path = './02A_thelot_before.py'
                     elif 'N+' in lot_sequence:
-                        print(f"Dataset for {lot_number} is downshift, and in the future sequence.")
-                        logging.info(f"Dataset for {lot_number} is downshift, and in the future sequence.")
+                        print(f"Dataset for {lot_number} is in the future sequence.")
+                        logging.info(f"Dataset for {lot_number} is in the future sequence.")
                         next_script_path = './02B_thelot_after.py'
                     else: # for debug
                         raise ValueError(f"Unexpected LOT_SEQUENCE format: {lot_sequence}")

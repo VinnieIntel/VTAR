@@ -2,8 +2,17 @@ import pandas as pd
 import os
 import logging
 import error_handling
+import sys
+import subprocess
 
-logging.basicConfig(filename='log_file.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+script_dir = os.path.dirname(__file__)
+log_path = os.path.join(script_dir,'log_file.log')
+the_lot_path = os.path.join(script_dir,"the_lot.csv")
+full_lot_list_path = os.path.join(script_dir,'full_lot_list.csv')
+processed_lot_list_path = os.path.join(script_dir,'lot_list_processed.csv')
+next_script_path = os.path.join(script_dir,'03_SQLPF.py')
+
+logging.basicConfig(filename=log_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("========================================================================")
 logging.info('Process 2B: Update Processed Lot List & New Lot Number to be process (+)')
 logging.info("========================================================================")
@@ -13,13 +22,9 @@ print(f"Process 2B: Update Processed Lot List & New Lot Number to be process (+)
 print("========================================================================")
 
 try:
-    full_lot_list_path = 'full_lot_list.csv'
     df_full = pd.read_csv(full_lot_list_path)
 
-    the_lot_path = "the_lot.csv"
-
     # Find the current lot
-    processed_lot_list_path = 'lot_list_processed.csv'
     df_processed = pd.read_csv(processed_lot_list_path)
     the_lot = df_processed['CLS_LOT'].iloc[0]
     print(f'Processed: {the_lot}')
@@ -46,7 +51,6 @@ try:
     the_lot = df_the_lot.loc[0, 'LOT']
 
     # Update the processed lot list CSV file
-    processed_lot_list_path = 'lot_list_processed.csv'
     df_processed = pd.read_csv(processed_lot_list_path)
 
     # Determine LOT_SEQUENCE for the new row
@@ -99,12 +103,10 @@ try:
     logging.info(f'To process next: {the_lot} ({new_sequence})')
     print(f"The new line for LOT {the_lot} with sequence {new_sequence} has been prepended to {processed_lot_list_path}.\n")
     logging.info(f"The new line for LOT {the_lot} with sequence {new_sequence} has been prepended to {processed_lot_list_path}.")
-
-
-
+    
     # Call next process
-    next_script_path = './03_SQLPF.py'
-    os.system(f'python {next_script_path}')
+    python_executable = sys.executable
+    subprocess.run([python_executable, next_script_path])
     
 except Exception as e:
     error_handling.handle_exception(e)

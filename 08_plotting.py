@@ -5,8 +5,16 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import logging
 import error_handling
+import sys
+import subprocess
 
-logging.basicConfig(filename='log_file.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+script_dir = os.path.dirname(__file__)
+log_path = os.path.join(script_dir,'log_file.log')
+lot_list_path = os.path.join(script_dir,'lot_list_processed.csv')
+info_path= os.path.join(script_dir,'output.csv')
+next_script_path = os.path.join(script_dir,'09_reply.py')
+
+logging.basicConfig(filename=log_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("==========================================")
 logging.info('Process 8: Plot the boxplot by Tool Cells')
 logging.info("==========================================")
@@ -16,14 +24,13 @@ print(f"Process 8: Plot the boxplot by Tool Cells")
 print("============================================")
 
 try: 
-    lot_list_path = 'lot_list_processed.csv'
     lot_list_df = pd.read_csv(lot_list_path)
     lot_list = lot_list_df['CLS_LOT'].tolist()[::-1] # make the boxplot goes in ascending order
     print(f'Lot List Processed: {lot_list}')
     logging.info(f'Lot List Processed: {lot_list}')
 
     # Get vmin values to plot
-    output_df = pd.read_csv('output.csv')
+    output_df = pd.read_csv(info_path)
     vmin_values = output_df['Domain Frequency Cores'].unique().tolist()
     print(f"Vmin values : {vmin_values}")
     logging.info(f"Vmin values : {vmin_values}")
@@ -31,7 +38,7 @@ try:
     print("\nThis process will take some time... Please wait...\n")
     logging.info("This process will take some time... Please wait...")
 
-    vmin_files_path = os.path.join(os.path.dirname(__file__),"VminFilesPlot")
+    vmin_files_path = os.path.join(script_dir,"VminFilesPlot")
     # vmin_files_path = "X:\VminFilesPlot" # This is for vinnie's own PC only, please use the above line for server
 
     vmin_files = glob.glob(os.path.join(vmin_files_path, "Vmin_*.csv"))
@@ -112,8 +119,8 @@ try:
     logging.info("-----DONE-----")
 
     #Call next process
-    next_script_path = './09_reply.py'
-    os.system(f'python {next_script_path}')
+    python_executable = sys.executable
+    subprocess.run([python_executable, next_script_path])
 
 except Exception as e:
     error_handling.handle_exception(e)

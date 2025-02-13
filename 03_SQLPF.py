@@ -6,8 +6,16 @@ import glob
 import shutil
 import time
 import error_handling
+import sys
+import subprocess
 
-logging.basicConfig(filename='log_file.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+script_dir = os.path.dirname(__file__)
+log_path = os.path.join(script_dir,'log_file.log')
+lot_csv_path = os.path.join(script_dir,'the_lot.csv')
+SPFSQL_File_path =os.path.join(script_dir,'vmin_norobocopy.spfsql')
+next_script_path = os.path.join(script_dir,'04_limit.py')
+
+logging.basicConfig(filename=log_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("====================================================")
 logging.info('Process 3: SQLPathFinder Python API to Get 3 Files')
 logging.info("====================================================")
@@ -17,7 +25,6 @@ print(f"Process 3: SQLPathFinder Python API to Get 3 Files")
 print("===================================================")
 
 try:
-    lot_csv_path = 'the_lot.csv'
     df_csv = pd.read_csv(lot_csv_path)
     the_lot = df_csv.loc[0,'LOT']
     print(f'The lot: {the_lot}\n')
@@ -35,7 +42,7 @@ try:
     HPC_API_Dir = r"\\atdfile3.ch.intel.com\atd-web\PathFinding\SQLPathFinder\Python_Packages\SPF_HPC"
     HPC_API_File = "SQLPFSvcClient.py"
     try:
-        call(["robocopy", HPC_API_Dir, ".", HPC_API_File, "/R:100", "/W:30", "/NP", "/IS", "/S", "/XO"])
+        call(["robocopy", HPC_API_Dir, script_dir, HPC_API_File, "/R:100", "/W:30", "/NP", "/IS", "/S", "/XO"])
     except:
         pass
 
@@ -114,11 +121,17 @@ try:
         retry_count = 0
         while retry_count < max_retries:
             try:
-                spf_client = SQLPFSvcClient(SPFSQL_File='vmin_norobocopy.spfsql',
+                spf_client = SQLPFSvcClient(SPFSQL_File=SPFSQL_File_path,
                                             SPF_CL_Args={'CL_LOTNUMBER': the_lot}) 
 
                 spf_client.Execute()
                 return  # Exit the function if successful
+            
+            except PermissionError as e:
+                logging.error(f"Permission error executing SQLPFSvcClient: {e}")
+                print(f"Permission error executing SQLPFSvcClient: {e}")
+                raise e  # Raise the exception to propagate it
+            
             except Exception as e:
                 logging.error(f"Error executing SQLPFSvcClient: {e}")
                 print(f"Error executing SQLPFSvcClient: {e}")
@@ -134,15 +147,18 @@ try:
 
     execute_spf_client()
 
-    next_script_path = './04_limit.py'
+    
     try:
-        os.system(f'python {next_script_path}')
+        python_executable = sys.executable
+        subprocess.run([python_executable, next_script_path])
+
     except Exception as e:
         logging.error(f"Error executing next script {next_script_path}: {e}")
         print(f"Error executing next script {next_script_path}: {e}")
         print("Retrying in 5 minutes...")
         time.sleep(300)  # Wait for 5 minutes
-        os.system(f'python {next_script_path}')  # Retry
+        python_executable = sys.executable
+        subprocess.run([python_executable, next_script_path]) # Retry
 
 except Exception as e:
     error_handling.handle_exception(e)

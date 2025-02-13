@@ -3,8 +3,18 @@ import os
 import datetime
 import logging
 import error_handling
+import sys
+import subprocess
 
-logging.basicConfig(filename='log_file.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+script_dir = os.path.dirname(__file__)
+log_path = os.path.join(script_dir,'log_file.log')
+lot_csv_path = os.path.join(script_dir,'the_lot.csv')
+limit_csv_path = os.path.join(script_dir,'find_limit.csv')
+next_script_path = os.path.join(script_dir,'05_checkTransaction.py')
+limit_value_path = os.path.join(script_dir,'limit_value.csv')
+
+
+logging.basicConfig(filename=log_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("====================================")
 logging.info('Process 4: Get the limit for the TP')
 logging.info("====================================")
@@ -14,7 +24,6 @@ print(f"Process 4: Get the limit for the TP")
 print("======================================")
 
 try: 
-    lot_csv_path = 'the_lot.csv'
     df_csv = pd.read_csv(lot_csv_path)
     lot_number  = df_csv.loc[0,'LOT']
 
@@ -24,7 +33,6 @@ try:
     print(f"Program Name: {program_name}")
     logging.info(f"Program Name: {program_name}")
 
-    limit_csv_path = 'find_limit.csv'
     df_limit = pd.read_csv(limit_csv_path)
 
     # Filter the rows with A01 for Site_list
@@ -46,7 +54,6 @@ try:
         logging.info (f"X_iqr: {x_iqr_value}")
         print (f"p25_delta: {delta_value}")
         logging.info(f"p25_delta: {delta_value}")
-        limit_value_path = 'limit_value.csv'
         df_limit_for_row.to_csv(limit_value_path,index=False)
         print(f"Output saved to '{limit_value_path}'")
         logging.info(f"Output saved to '{limit_value_path}'")
@@ -56,8 +63,8 @@ try:
         logging.info("No mathching program names found in the limit file list")
 
     # Call next process
-    next_script_path = './05_checkTransaction.py'
-    os.system(f'python {next_script_path}')
+    python_executable = sys.executable
+    subprocess.run([python_executable, next_script_path])
     
 except Exception as e:
     error_handling.handle_exception(e)

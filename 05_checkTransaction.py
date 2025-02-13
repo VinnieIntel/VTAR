@@ -5,10 +5,18 @@ import os
 import logging
 import error_handling
 import time
+import sys
+import subprocess
 
 warnings.filterwarnings("ignore")
 
-logging.basicConfig(filename='log_file.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+script_dir = os.path.dirname(__file__)
+log_path = os.path.join(script_dir,'log_file.log')
+the_lot_path = os.path.join(script_dir,"the_lot.csv")
+lot_transaction = os.path.join(script_dir,'lot_transaction.csv')
+next_script_path = os.path.join(script_dir,'06_scatterplot.py')
+
+logging.basicConfig(filename=log_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("===================================================")
 logging.info('Process 5: Check the Transaction Status of the lot')
 logging.info("===================================================")
@@ -18,7 +26,6 @@ print(f"Process 5: Check the Transaction Status of the lot")
 print("=====================================================")
 
 try: 
-    the_lot_path = "the_lot.csv"
     df_csv = pd.read_csv(the_lot_path)
     lot_number  = df_csv.loc[0,'LOT']
     operation = df_csv.loc[0,'OPERATION']
@@ -47,7 +54,6 @@ try:
 
                 df_aries = pd.read_sql(sql_aries, con_aries)
 
-                lot_transaction = 'lot_transaction.csv'
                 df_aries.to_csv(lot_transaction, index=False)
                 print(f"Status of {lot_number} saved to '{lot_transaction}'") 
                 logging.info(f"Status of {lot_number} saved to '{lot_transaction}'") 
@@ -72,8 +78,8 @@ try:
     extract_database(lot_number, operation)
 
     # Call next process
-    next_script_path = './scatterplot3.py'
-    os.system(f'python {next_script_path}')
+    python_executable = sys.executable
+    subprocess.run([python_executable, next_script_path])
 
 except Exception as e:
     error_handling.handle_exception(e)
