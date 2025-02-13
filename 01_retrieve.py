@@ -7,10 +7,20 @@ import glob
 import datetime
 import logging
 import time
+import sys
+import subprocess
 
 wait_duration = 60 * 60  # One hour check one time
 
-logging.basicConfig(filename='log_file.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Set file location
+script_dir = os.path.dirname(__file__)
+log_path = os.path.join(script_dir,'log_file.log')
+email_id_path = os.path.join(script_dir,'email_entry_id.txt')
+output_csv_path = os.path.join(script_dir, 'output.csv')
+data_folder_path_storage = os.path.join(script_dir,'data_folder_path.txt')
+next_script_path = os.path.join(script_dir,'02_lotlist.py')
+
+logging.basicConfig(filename=log_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("============================================")
 logging.info('Process 1: Retrieve information from email')
 logging.info("============================================")
@@ -18,7 +28,7 @@ logging.info("============================================")
 print("\n============================================")
 print(f"Process 1: Retrieve information from email")
 print("============================================")
-
+                       
 # Delete previous files
 files_to_delete_directory = os.path.dirname(__file__)
 png_files = glob.glob(os.path.join(files_to_delete_directory, '*.png'))
@@ -114,8 +124,8 @@ def process_email():
     # (newest first)
     messages.Sort("[ReceivedTime]", True)
 
-    # sender_email = "yasothye.muniandy@intel.com"
-    sender_email ="vinnie.wen.ying.tiang@intel.com"
+    sender_email = "yasothye.muniandy@intel.com"
+    # sender_email ="vinnie.wen.ying.tiang@intel.com"
     subject_keyword = "HDMX_Vmin Check "
 
     email_found = False
@@ -187,7 +197,7 @@ def process_email():
                 break
 
     if email_found:
-        with open('email_entry_id.txt', 'r') as file:
+        with open(email_id_path, 'r') as file:
             existing_entry_id = file.read().strip()
 
         if message.EntryID == existing_entry_id:
@@ -195,11 +205,8 @@ def process_email():
             logging.info(f'No new trigger email detected. :) ')
             logging.info('*************************************************************************\n')
         else:
-            with open('email_entry_id.txt', 'w') as file:
+            with open(email_id_path, 'w') as file:
                 file.write(message.EntryID)
-
-            script_dir = os.path.dirname(__file__)
-            output_csv_path = os.path.join(script_dir, 'output.csv')
 
             max_length = max(len(info['domain_frequency_cores']), len(info['tool_names']), len(info['cell_names']))
             data = {
@@ -210,7 +217,7 @@ def process_email():
                 'Unit Tester Id': [info['unit_tester_id']] * max_length,
             }
             output_df = pd.DataFrame(data)
-            output_df.to_csv('output.csv', index=False)
+            output_df.to_csv(output_csv_path, index=False)
             print(f"Output saved to '{output_csv_path}'")
             logging.info(f"Output saved to '{output_csv_path}'")
 
@@ -220,14 +227,16 @@ def process_email():
             lot_number = df_info['Lot Number'].iloc[0]
             storage_folder = r"\\KMATSHFS.intel.com\KMATAnalysis$\MAOATM\PG\Personal\vtiang"
             data_folder_path = os.path.join(storage_folder, lot_number)
+            os.makedirs(data_folder_path, exist_ok=True)
             print(data_folder_path)
             logging.info(data_folder_path)
-            with open('data_folder_path.txt', 'w') as file:
+            with open(data_folder_path_storage, 'w') as file:
                 file.write(data_folder_path)
 
             # Call next process
-            next_script_path = './02_lotlist.py'
-            os.system(f'python {next_script_path}')
+            python_executable = sys.executable
+            subprocess.run([python_executable, next_script_path])
+
     else:
         print(f"No email found from {sender_email} with the subject '{subject_keyword}'.")
         logging.info(f"No email found from {sender_email} with the subject '{subject_keyword}'.")
