@@ -77,7 +77,7 @@ def extract_info_from_html(html_content, lot="Lot", dfc_pattern=r"Vmin@[A-Z0-9]+
                     result["lot_number"] = lot_column[lot_index].get_text(strip=True)
                 else:
                     print(f"Warning: 'Lot' column index ({lot_index}) is out of range for the row.")
-                    logging.info(f"Warning: 'Lot' column index ({lot_index}) is out of range for the row.")
+                    logging.warning(f"'Lot' column index ({lot_index}) is out of range for the row.")
 
         if unit_tester_id in headers:
             tester_index = headers.index(unit_tester_id)
