@@ -91,7 +91,8 @@ try:
         plt.tight_layout() 
 
         plot_filename = f'Scatterplot_{fac_lot_number}.png'
-        plt.savefig(plot_filename)
+        plot_filename_path = os.path.join(script_dir,plot_filename)
+        plt.savefig(plot_filename_path)
         plt.close()
 
         # Rename the vmin_result file to include the lot number
@@ -126,7 +127,8 @@ try:
         plt.legend()
         plt.tight_layout() 
         plot_centroid_filename = f'Scatterplot_centroid_{fac_lot_number}.png'
-        plt.savefig(plot_centroid_filename)
+        plot_centroid_filename_path = os.path.join(script_dir, plot_centroid_filename) #Absolute path
+        plt.savefig(plot_centroid_filename_path)
         plt.close()
 
         distance_threshold = 0.5  # Adjust here if needed
@@ -168,6 +170,7 @@ try:
     filename = os.path.basename(vmin_file)
     new_path = os.path.join(data_folder_path, filename)
     shutil.move(vmin_file, new_path)
+    print(f'{filename} moved to {new_path}')
 
     df_lot_list = pd.read_csv(lot_list_path)
     print(f'Lot Number processing: {lot_number}')

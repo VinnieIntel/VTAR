@@ -3,9 +3,12 @@ import traceback
 import win32com.client as client
 import os
 
+script_dir = os.path.dirname(__file__)
+email_id_path = os.path.join(script_dir,'email_entry_id.txt')
+
 def send_error_email(error_message):
     try:
-        with open('email_entry_id.txt', 'r') as file:
+        with open(email_id_path, 'r') as file:
             email_entry_id = file.read().strip()
         outlook = client.Dispatch("Outlook.Application").GetNamespace("MAPI")
         mail_item = outlook.GetItemFromID(email_entry_id)

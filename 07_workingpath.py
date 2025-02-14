@@ -11,7 +11,8 @@ import subprocess
 script_dir = os.path.dirname(__file__)
 log_path = os.path.join(script_dir,'log_file.log')
 data_folder_path_storage = os.path.join(script_dir,'data_folder_path.txt')
-next_script_path = os.path.join(script_dir,'plotting.py')
+next_script_path = os.path.join(script_dir,'08_plotting.py')
+
 
 logging.basicConfig(filename=log_path, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.info("=================================================")
@@ -86,7 +87,7 @@ try:
     with open(data_folder_path_storage, 'r') as file:
         data_folder_path = file.read().strip()
     
-    scatterplot_files = glob.glob(os.path.join(os.path.dirname(__file__),"Scatterplot_centroid_*"))
+    scatterplot_files = glob.glob(os.path.join(script_dir,"Scatterplot_centroid_*"))
     print(f"LOADING......")
     logging.info('LOADING......')
 
