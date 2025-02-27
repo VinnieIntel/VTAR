@@ -19,9 +19,16 @@ https://content.sp2019.intel.com/sites/ATMICMPCS/RFCvault/45_ICMPCS_PBICVmin_CSR
 
 
 5. Create a new python virtual environment if the current one is not working. Then go into the .venv and download the requirements needed using 
+```
+python -m venv myenv
+myenv\Scripts\activate
 pip install -r requirements.txt
-
-
+```
+If meet > ERROR: Could not find a version that satisfies the requirement, 
+try
+```
+pip install -r requirements.txt--index-url https://pypi.org/simple
+```
 6. To rerun the script when there is an interupt, perhaps due to error occur, make sure
     - open atdfile3 HIST folder, clear it.
     - run from the last script, 10_movefiles.py (to make sure VminFilesPlot folder is deleted) this will then call first script and so on.
